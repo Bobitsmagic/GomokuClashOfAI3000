@@ -18,15 +18,30 @@ namespace Gomoku
 			lost = false;
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
-			FinalBoard = AlphaBetaV2.Solve(board);
+			FinalBoard = AlphaBetaV2.Solve(board); 
+				
 			sw.Stop();
-			Console.WriteLine(FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000"));
+			Console.WriteLine("Alpha:  "  + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000"));
 			if(FinalBoard.LastMove == new Position(-1, -1))
 			{
-
 				lost = true;
 			}
 		}
+		public HansAI(Board board, long time)
+		{
+			lost = false;
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			FinalBoard = Jochen.Predict(board, time);
+
+			sw.Stop();
+			Console.WriteLine("Jochen: " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " it: " + Jochen.Iteration.ToString("0 000"));
+			if (FinalBoard.LastMove == new Position(-1, -1))
+			{
+				lost = true;
+			}
+		}
+
 
 
 		private class MinMaxNode
@@ -275,6 +290,159 @@ namespace Gomoku
 						}
 					}
 					return minWert;
+				}
+			}
+		}
+		
+		private static class Jochen
+		{
+			const double FACTOR = 3;
+			public static int Iteration;
+			static Random Rnd;
+
+			public static Board Predict(Board b, long maxTime)
+			{
+                //Console.WriteLine("Hallo Welt");
+				Rnd = new Random();
+
+				long tickstart = Environment.TickCount;
+
+				Root r = new Root(b, !b.Turn);
+				Board.Brick won = Board.Brick.Empty;
+				Iteration = 0;
+				while (Environment.TickCount - tickstart < maxTime && won == Board.Brick.Empty)
+				{
+					won = r.Visit();
+					Iteration++;
+				}
+
+				if (won != Board.Brick.Empty)
+				{
+					Console.WriteLine("Winner is " + won);
+					return new Board();
+				}
+
+				return r.GetBest();
+			}
+
+
+			class Root : IComparable<Root>
+			{
+
+				public double Value;
+				public int VCount;
+				private bool Maximize;
+
+				public Board.Brick currentWinner { get { return board.Winner; } }
+				private bool mixed;
+
+				private Board board;
+				private List<Root> moves;
+
+				public Root(Board b, bool max)
+				{
+					board = b;
+					Maximize = max;
+
+					VCount = 0;
+					Value = board.Eva;
+
+					mixed = false;
+				}
+
+				public Board.Brick Visit()
+				{
+					if(VCount == 0)
+					{
+						moves = board.GetMoves().Select(x => new Root(x, !Maximize)).ToList();
+
+						if(moves.Count > 0)
+						{
+							for(int i = 0; i < moves.Count; i++)
+							{
+								if (moves[i].currentWinner != Board.Brick.Empty)
+								{
+									moves = new List<Root>(1) { moves[i] };
+									return moves[0].currentWinner;
+								}
+							}
+						}
+					}
+					else
+					{
+						//Root best = Maximize ? moves.Max() : moves.Min();
+						Root best = moves.Min();
+						Board.Brick won = best.Visit();
+
+						if (won != Board.Brick.Empty)
+						{
+							if (won == (Maximize ? Board.Brick.White : Board.Brick.Black))
+							{
+								moves = new List<Root>(1) { best };
+								return won;
+							}
+							else
+							{
+								moves.Remove(best);
+							}
+						}
+					}
+
+					CalcVal();
+					VCount++;
+
+					return moves.Count > 0 ? Board.Brick.Empty : Maximize ? Board.Brick.Black : Board.Brick.White;
+					
+					void CalcVal()
+					{
+						Value = Maximize ? double.MinValue : double.MaxValue;
+						for (int i = 0; i < moves.Count; i++)
+						{
+							if (Maximize) Value = Math.Max(Value, moves[i].Value);
+							else Value = Math.Min(Value, moves[i].Value);
+						}
+					}
+				}
+
+				public Board GetBest()
+				{
+					Root ret = moves[Rnd.Next(moves.Count)];
+
+					for(int i = 0; i < moves.Count; i++)
+					{
+						if (Maximize)
+						{
+							if(moves[i].Value > ret.Value)
+							{
+								ret = moves[i];
+							}
+						}
+						else
+						{
+							if (moves[i].Value < ret.Value)
+							{
+								ret = moves[i];
+							}
+						}
+					}
+
+					val = ret.Value;
+					return ret.board;
+				}
+
+				public int CompareTo(Root other)
+				{
+					if (VCount == other.VCount)
+					{
+						if (Maximize) return Value.CompareTo(other.Value);
+						else return -Value.CompareTo(other.Value);
+					}
+					else return VCount.CompareTo(other.VCount);
+				}
+
+				public override string ToString()
+				{
+					return board.LastMove + ", vCount: " + VCount.ToString("000") + " Value: " + Value.ToString("0.00");
 				}
 			}
 		}

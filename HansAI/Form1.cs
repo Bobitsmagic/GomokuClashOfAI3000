@@ -32,7 +32,7 @@ namespace Gomoku
 		{
 			//b.ParseMove(e.Location);
 			//Refresh();
-			//HansAI bob = new HansAI(b);
+			//HansAI bob = new HansAI(b, 10000);
 			//b = bob.FinalBoard;
 			//Refresh();
 
@@ -47,13 +47,24 @@ namespace Gomoku
 				while (!HansAI.lost)
 				{
 					Console.Write(i++ + " ");
-					HansAI bob = new HansAI(b);
+					HansAI bob = new HansAI(b, 10000);
 					b = bob.FinalBoard;
 					Refresh();
+
+					Console.Write(i++ + " ");
+					bob = new HansAI(b);
+					b = bob.FinalBoard;
+					Refresh();
+
 				}
 
 				max = Math.Max(i, max);
 			}
+		}
+
+		private void BEngine1_Click(object sender, EventArgs e)
+		{
+			HansAI bob = new HansAI(b, 10000);
 		}
 	}
 }

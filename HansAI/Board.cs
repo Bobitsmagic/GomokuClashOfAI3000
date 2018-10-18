@@ -144,7 +144,6 @@ namespace Gomoku
 
 		private double Evaluate()
 		{
-			const bool write = true;
 			double v = 0;
 
 			int tCounter = 0;
@@ -338,6 +337,7 @@ namespace Gomoku
 			//Diagonal
 			for (int i = 1; i < Sidelength * 2; i++)
 			{
+				if (i == 2 * Sidelength - 1) continue;
 				Position pos = new Position(i % Sidelength, 0);
 				if (i > Sidelength) pos.Swap();
 
@@ -416,6 +416,8 @@ namespace Gomoku
 					pos += new Position(1, -1);
 				}
 			}
+
+
 		}
 
 		public void Draw(Graphics g)
@@ -481,19 +483,19 @@ namespace Gomoku
 			s += "Turn: " + (Turn ? "Black" : "White") + "\n"; 
 			s += "Winner: " + Winner.ToString() + "\n";
 			s += "Eva: " + Eva.ToString("0.000") + "\n";
-			for (int y = 0; y < Sidelength; y++)
-			{
-				for(int x = 0; x < Sidelength; x++)
-				{
-					switch (Field[x, y])
-					{
-						case Brick.White: s += "O"; break;
-						case Brick.Black: s += "X"; break;
-						case Brick.Empty: s += "#"; break;
-					}
-				}
-				s += "\n";
-			}
+			//for (int y = 0; y < Sidelength; y++)
+			//{
+			//	for(int x = 0; x < Sidelength; x++)
+			//	{
+			//		switch (Field[x, y])
+			//		{
+			//			case Brick.White: s += "O"; break;
+			//			case Brick.Black: s += "X"; break;
+			//			case Brick.Empty: s += "#"; break;
+			//		}
+			//	}
+			//	s += "\n";
+			//}
 
 			Console.WriteLine(s);
 		}
@@ -522,7 +524,8 @@ namespace Gomoku
 		private class Line
 		{
 			public readonly Position Start, End;
-			public Position Normalized { get { return (End - Start).Sign(); } }
+			public Position Normalized { get
+				{ return (End - Start).Sign(); } }
 			public int Length { get
 				{
 					if (Start.X - End.X != 0) return Math.Abs(Start.X - End.X) + 1;
@@ -564,17 +567,17 @@ namespace Gomoku
 
 	struct Position : IComparable<Position>
 	{
-		public byte X, Y;
+		public short X, Y;
 
 		public Position(int x, int y)
 		{
-			X = (byte)x;
-			Y = (byte)y;
+			X = (short)x;
+			Y = (short)y;
 		}
 		public Position(Point p)
 		{
-			X = (byte)p.X;
-			Y = (byte)p.Y;
+			X = (short)p.X;
+			Y = (short)p.Y;
 		}
 
 		public int CompareTo(Position other)
@@ -595,7 +598,7 @@ namespace Gomoku
 		}
 		public void Swap()
 		{
-			byte b = X;
+			short b = X;
 			X = Y;
 			Y = b;
 		}
@@ -641,7 +644,7 @@ namespace Gomoku
 
 		public override string ToString()
 		{
-			return "{" + X + " | " + Y + "}";
+			return "{" + X.ToString("00") + " | " + Y.ToString("00") + "}";
 		}
 
 	}
