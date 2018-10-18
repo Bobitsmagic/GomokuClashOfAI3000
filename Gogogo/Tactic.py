@@ -8,7 +8,14 @@ W = "W"
 
 class Tactic:
     def __init__(self):
-        self.grid = [["L", "X", "X", "X", "X"]]
+        #self.pattern = [["L", "X", "X", "X", "X"]]
+        self.pattern = [
+            ["L", "E", "E", "E", "E"],
+            ["E", "X", "E", "E", "E"],
+            ["E", "E", "X", "E", "E"],
+            ["E", "E", "E", "X", "E"],
+            ["E", "E", "E", "E", "X"],
+        ]
 
         #m = [
         #["A", "B", "C", "D", "F"],
@@ -33,8 +40,24 @@ class Tactic:
         #m = self.rotate(m)
 
     def render(self):
-        for row in self.grid:
+        for row in self.pattern:
             print(row)
+
+    def recommend(self, board, stone):
+        bestMatch = None
+        bestMatchPercent = 0.0
+        for y in range(board.h):
+            for x in range(board.w):
+                matchPercent = board.patternMatchPercent(self.pattern, x, y, stone)
+                if matchPercent > 0.0:
+                    if bestMatch == None or matchPercent > bestMatchPercent:
+                        bestMatch = [x, y]
+                        bestMatchPercent = matchPercent
+
+        # [LEFTOFF] Currently it does not select a random piece that already hasn't been played in the pattern...
+        # Get it to do this
+        print("Found a match with a percentage of {}".format(bestMatchPercent))
+        return bestMatch
 
     # [TODO] Fix this so that it ACTUALLY works all the time...
     def rotate(self, m):
@@ -53,9 +76,9 @@ class Tactic:
             for x in range(0 - cx, w - cx):
                 px = x
                 py = y
-                #px -= cx
+
+                nx = px * c - py * s#px -= cx
                 #py -= cy
-                nx = px * c - py * s
                 ny = px * s + py * c
                 px = nx
                 py = ny

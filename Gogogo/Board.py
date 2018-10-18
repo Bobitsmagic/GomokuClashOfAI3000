@@ -75,3 +75,22 @@ class Board:
             return None
 
         return self.adjacentMatches(stone, x + deltaX, y + deltaY, deltaX, deltaY, n - 1)
+
+    def patternMatchPercent(self, pattern, x, y, expectStone):
+        retVal = 0.0
+
+        w = len(pattern[0])
+        h = len(pattern)
+        for cy in range(h):
+            for cx in range(w):
+                current = pattern[cy][cx]
+                if current != "X" and current != "L":
+                    continue
+
+                stone = self.getStone(x + cx, y + cy)
+                if stone != expectStone and stone != E:
+                    return 0.0
+                elif stone == expectStone:
+                    retVal += 1.0
+
+        return retVal

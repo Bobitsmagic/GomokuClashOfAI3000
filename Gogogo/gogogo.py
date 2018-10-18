@@ -2,7 +2,6 @@
 
 from AI import AI
 from Board import Board
-from Tactic import Tactic
 
 E = "E"
 B = "B"
@@ -13,7 +12,7 @@ b = AI(board, B)
 w = AI(board, W)
 
 turn = 0
-turns = 1000
+turns = 3
 winner = None
 while winner == None and turn < turns:
     for ai in [b, w]:
@@ -30,6 +29,3 @@ while winner == None and turn < turns:
 if winner != None:
     print(winner.stone + " wins!")
     print("History: {}".format(winner.board.history))
-
-tactic = Tactic()
-tactic.render()
