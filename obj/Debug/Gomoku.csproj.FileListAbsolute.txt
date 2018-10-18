@@ -1,0 +1,10 @@
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.exe.config
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.exe
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\bin\Debug\Gomoku.pdb
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csprojAssemblyReference.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.Screen.resources
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.Properties.Resources.resources
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csproj.GenerateResource.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csproj.CoreCompileInputs.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.exe
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.pdb
