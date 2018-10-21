@@ -8,3 +8,13 @@ C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Go
 C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.csproj.CoreCompileInputs.cache
 C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.exe
 C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\obj\Debug\Gomoku.pdb
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\bin\Debug\Gomoku.exe.config
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\bin\Debug\Gomoku.exe
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\bin\Debug\Gomoku.pdb
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.csprojAssemblyReference.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.Screen.resources
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.Properties.Resources.resources
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.csproj.GenerateResource.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.csproj.CoreCompileInputs.cache
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.exe
+C:\Users\Martin\Documents\Visual Studio 2017\Projects\Gomoku\Gomoku\HansAI\obj\Debug\Gomoku.pdb

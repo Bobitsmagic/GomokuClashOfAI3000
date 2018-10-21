@@ -161,7 +161,7 @@ namespace Gomoku
 			}
 			if (tCounter >= 2) v -= 50;
 
-			return v + (rnd.NextDouble()*2 -1) * 0.5;
+			return v + (rnd.NextDouble()*2 -1) * 0;
 
 			double EvaluateLine(Line l)
 			{		

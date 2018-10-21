@@ -33,7 +33,7 @@
 			// 
 			// BEngine1
 			// 
-			this.BEngine1.Location = new System.Drawing.Point(629, 13);
+			this.BEngine1.Location = new System.Drawing.Point(635, 12);
 			this.BEngine1.Name = "BEngine1";
 			this.BEngine1.Size = new System.Drawing.Size(75, 23);
 			this.BEngine1.TabIndex = 0;

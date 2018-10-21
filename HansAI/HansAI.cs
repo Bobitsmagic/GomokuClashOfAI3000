@@ -9,8 +9,8 @@ namespace Gomoku
 {
 	class HansAI
 	{
-
 		public static bool lost = false;
+		public static bool Version = false;
 		static double val = 0;
 		public Board FinalBoard;
 		public HansAI(Board board)
@@ -18,11 +18,11 @@ namespace Gomoku
 			lost = false;
 			Stopwatch sw = new Stopwatch();
 			sw.Start();
-			FinalBoard = AlphaBetaV2.Solve(board); 
-				
+			FinalBoard = AlphaBetaV2.Solve(board);
+
 			sw.Stop();
-			Console.WriteLine("Alpha:  "  + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000"));
-			if(FinalBoard.LastMove == new Position(-1, -1))
+			Console.WriteLine("Alpha:  " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000"));
+			if (FinalBoard.LastMove == new Position(-1, -1))
 			{
 				lost = true;
 			}
@@ -35,197 +35,13 @@ namespace Gomoku
 			FinalBoard = Jochen.Predict(board, time);
 
 			sw.Stop();
-			Console.WriteLine("Jochen: " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " it: " + Jochen.Iteration.ToString("0 000"));
+			Console.WriteLine("Jochen: " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " Depth: " + Jochen.Deepness.ToString());
 			if (FinalBoard.LastMove == new Position(-1, -1))
 			{
 				lost = true;
 			}
 		}
 
-
-
-		private class MinMaxNode
-		{
-			static int MaxDepth = 6;
-
-			public double Value;
-			public bool Maximize;
-
-			public MinMaxNode(Board board, out Board BestMove)
-			{
-				Maximize = !board.Turn;
-				Value = Maximize ? double.MinValue : double.MaxValue;
-
-				List<Board> list = board.GetMoves();
-				BestMove = list[0];
-
-				MinMaxNode buffer;
-
-				for (int i = 0; i < list.Count; i++)
-				{
-					if (Maximize)
-					{
-						if (Value == 1000) return;
-					}
-					else if (Value == -1000) return;
-
-					buffer = new MinMaxNode(list[i], !Maximize, 1);
-
-					if (Maximize)
-					{
-						if (buffer.Value > Value)
-						{
-							Value = buffer.Value;
-							BestMove = list[i];
-						}
-					}
-					else
-					{
-						if (buffer.Value < Value)
-						{
-							Value = buffer.Value;
-							BestMove = list[i];
-						}
-					}
-				}
-
-				val = Value;
-			}
-			private MinMaxNode(Board board, bool maximize, int depth)
-			{
-				if(depth == MaxDepth)
-				{
-					Value = board.Eva;
-					return;
-				}
-
-				Maximize = maximize;
-				Value = Maximize ? double.MinValue : double.MaxValue;
-				List<Board> list = board.GetMoves();
-
-				for (int i = 0; i < list.Count; i++)
-				{
-					if (Maximize)
-					{
-						if (Value == 1000) return;
-					}
-					else if (Value == -1000) return;
-
-					MinMaxNode buffer = new MinMaxNode(list[i], !Maximize, depth + 1);
-
-					if (Maximize)
-					{
-						if (buffer.Value > Value)
-						{
-							Value = buffer.Value;
-						}
-					}
-					else
-					{
-						if (buffer.Value < Value)
-						{
-							Value = buffer.Value;
-						}
-					}
-				}
-
-				val = Value;
-
-			}
-		}
-
-		private class AlphaBetaNode
-		{
-			static int MaxDepth = 7;
-
-			public double Alpha, Beta;
-			public double GetValue { get { return Maximize ? Alpha : Beta; } }
-			public bool Maximize;
-
-			public AlphaBetaNode(Board board, out Board BestMove)
-			{
-				Maximize = !board.Turn;
-				Alpha = double.MinValue;
-				Beta = double.MaxValue;
-
-				List<Board> list = board.GetMoves();
-				list.Sort();
-				BestMove = list[0];
-
-				AlphaBetaNode buffer;
-
-				if (Maximize)
-				{
-					for (int i = list.Count - 1; i >= 0 && Beta > Alpha; i--)
-					{
-						buffer = new AlphaBetaNode(Alpha, Beta, list[i], !Maximize, 1);
-						if (Alpha < buffer.GetValue)
-						{
-							Alpha = buffer.GetValue;
-							val = Alpha;
-							BestMove = list[i];
-						}
-					}
-				}
-				else
-				{
-					for (int i = 0; i < list.Count && Beta > Alpha; i++)
-					{
-						buffer = new AlphaBetaNode(Alpha, Beta, list[i], !Maximize, 1);
-						if (Beta > buffer.GetValue)
-						{
-							Beta = buffer.GetValue;
-							val = Beta;
-							BestMove = list[i];
-						}
-					}
-				}
-			}
-			private AlphaBetaNode(double min, double max, Board board, bool maximize, int depth)
-			{
-				Maximize = maximize;
-
-				Alpha = min;
-				Beta = max;
-
-				if (depth == MaxDepth)
-				{
-					if (Maximize) Alpha = board.Eva;
-					else Beta = board.Eva;
-				}
-				else
-				{
-					List<Board> list = board.GetMoves();
-					AlphaBetaNode buffer;
-
-					list.Sort();
-					if (Maximize)
-					{
-						for (int i = list.Count - 1; i >= 0 && Beta > Alpha; i--)
-						{
-							buffer = new AlphaBetaNode(Alpha, Beta, list[i], !Maximize, depth + 1);
-							if (Alpha < buffer.GetValue)
-							{
-								Alpha = buffer.GetValue;
-							}
-						}
-					}
-					else
-					{
-						for (int i = 0; i < list.Count && Beta > Alpha; i++)
-						{
-							buffer = new AlphaBetaNode(Alpha, Beta, list[i], !Maximize, depth + 1);
-							if (Beta > buffer.GetValue)
-							{
-								Beta = buffer.GetValue;
-							}
-						}
-					}
-
-				}
-
-			}
-		}
 		private static class AlphaBetaV2
 		{
 			const int MaxDepth = 6;
@@ -252,7 +68,7 @@ namespace Gomoku
 					moves.Reverse();
 
 					if (moves.Count == 0) return board.Eva;
-					for(int i = 0; i < moves.Count; i++)
+					for (int i = 0; i < moves.Count; i++)
 					{
 						double wert = min(tiefe - 1, maxWert, beta, moves[i]);
 
@@ -262,7 +78,7 @@ namespace Gomoku
 							if (maxWert >= beta)
 								break;
 
-							if (tiefe == MaxDepth) ret = moves[i]; 
+							if (tiefe == MaxDepth) ret = moves[i];
 						}
 					}
 					return maxWert;
@@ -293,21 +109,22 @@ namespace Gomoku
 				}
 			}
 		}
-		
+
 		private static class Jochen
 		{
-			const double FACTOR = 3;
+			const double FACTOR = 0.03;
 			public static int Iteration;
+			public static int Deepness;
 			static Random Rnd;
 
 			public static Board Predict(Board b, long maxTime)
 			{
-                //Console.WriteLine("Hallo Welt");
+				//Console.WriteLine("Hallo Welt");
 				Rnd = new Random();
-
+				Deepness = 0;
 				long tickstart = Environment.TickCount;
 
-				Root r = new Root(b, !b.Turn);
+				Root r = new Root(b, !b.Turn, 1);
 				Board.Brick won = Board.Brick.Empty;
 				Iteration = 0;
 				while (Environment.TickCount - tickstart < maxTime && won == Board.Brick.Empty)
@@ -328,18 +145,18 @@ namespace Gomoku
 
 			class Root : IComparable<Root>
 			{
-
-				public double Value;
+				private double Value;
+				private double CTP;
 				public int VCount;
 				private bool Maximize;
+				int Depth = 0;
 
 				public Board.Brick currentWinner { get { return board.Winner; } }
-				private bool mixed;
 
 				private Board board;
 				private List<Root> moves;
 
-				public Root(Board b, bool max)
+				public Root(Board b, bool max, int depth)
 				{
 					board = b;
 					Maximize = max;
@@ -347,18 +164,19 @@ namespace Gomoku
 					VCount = 0;
 					Value = board.Eva;
 
-					mixed = false;
+					Depth = depth;
+					Deepness = Math.Max(Deepness, depth);
 				}
 
 				public Board.Brick Visit()
 				{
-					if(VCount == 0)
+					if (VCount == 0)
 					{
-						moves = board.GetMoves().Select(x => new Root(x, !Maximize)).ToList();
+						moves = board.GetMoves().Select(x => new Root(x, !Maximize, Depth + 1)).ToList();
 
-						if(moves.Count > 0)
+						if (moves.Count > 0)
 						{
-							for(int i = 0; i < moves.Count; i++)
+							for (int i = 0; i < moves.Count; i++)
 							{
 								if (moves[i].currentWinner != Board.Brick.Empty)
 								{
@@ -392,7 +210,7 @@ namespace Gomoku
 					VCount++;
 
 					return moves.Count > 0 ? Board.Brick.Empty : Maximize ? Board.Brick.Black : Board.Brick.White;
-					
+
 					void CalcVal()
 					{
 						Value = Maximize ? double.MinValue : double.MaxValue;
@@ -401,6 +219,9 @@ namespace Gomoku
 							if (Maximize) Value = Math.Max(Value, moves[i].Value);
 							else Value = Math.Min(Value, moves[i].Value);
 						}
+
+						if (Maximize) CTP = -Value * FACTOR + Math.Sqrt(VCount);
+						else CTP = Value * FACTOR + Math.Sqrt(VCount);
 					}
 				}
 
@@ -408,11 +229,11 @@ namespace Gomoku
 				{
 					Root ret = moves[Rnd.Next(moves.Count)];
 
-					for(int i = 0; i < moves.Count; i++)
+					for (int i = 0; i < moves.Count; i++)
 					{
 						if (Maximize)
 						{
-							if(moves[i].Value > ret.Value)
+							if (moves[i].Value > ret.Value)
 							{
 								ret = moves[i];
 							}
@@ -432,12 +253,19 @@ namespace Gomoku
 
 				public int CompareTo(Root other)
 				{
-					if (VCount == other.VCount)
+					if (Version)
 					{
-						if (Maximize) return Value.CompareTo(other.Value);
-						else return -Value.CompareTo(other.Value);
+						return CTP.CompareTo(other.CTP);
 					}
-					else return VCount.CompareTo(other.VCount);
+					else
+					{
+						if (VCount == other.VCount)
+						{
+							if (Maximize) return Value.CompareTo(other.Value);
+							else return -Value.CompareTo(other.Value);
+						}
+						else return VCount.CompareTo(other.VCount);
+					}
 				}
 
 				public override string ToString()

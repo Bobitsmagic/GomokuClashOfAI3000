@@ -46,13 +46,17 @@ namespace Gomoku
 				int i = 0;
 				while (!HansAI.lost)
 				{
+					Application.DoEvents();
+
+					HansAI.Version = !HansAI.Version;
 					Console.Write(i++ + " ");
-					HansAI bob = new HansAI(b, 10000);
+					HansAI bob = new HansAI(b, 20000);
 					b = bob.FinalBoard;
 					Refresh();
 
+					HansAI.Version = !HansAI.Version;
 					Console.Write(i++ + " ");
-					bob = new HansAI(b);
+					bob = new HansAI(b, 20000);
 					b = bob.FinalBoard;
 					Refresh();
 
