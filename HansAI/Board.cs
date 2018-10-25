@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Numerics;
 using System.Drawing;
+using System.Linq;
 
 namespace Gomoku
 {
-	class Board : IComparable<Board>
+	internal class Board : IComparable<Board>
 	{
-		static Random rnd = new Random();
-		Position gOffset = new Position(15, 15);
-		const int drawSize = 30;
+		private static Random rnd = new Random();
+		private Position gOffset = new Position(15, 15);
+		private const int drawSize = 30;
 
 		public enum Brick : byte
 		{
 			Empty, White, Black, Error
 		}
+
 		private enum LineType : byte
 		{
 			Length = 3,
@@ -25,22 +23,19 @@ namespace Gomoku
 
 			Openness = 12,
 			Open = 0, Blocked = 4, Closed = 12,
-			
+
 			Smotheness = 16,
 			Smothed = 16
 		}
 
 		public const int Sidelength = 17;
 
-		public double Eva = 0;
-		public bool Turn = false;
+		public double Eva = double.NaN;
+		public Brick Turn = Brick.White;
 		public Brick Winner = Brick.Empty;
 		public Position LastMove = new Position(-1, -1);
 
-		//public SortedList<int, int>[] White, Black;
-		//private BrickList White, Black;
-
-		List<Line> whiteL, blackL;
+		private List<Line> whiteL, blackL;
 		public Brick[,] Field = new Brick[Sidelength, Sidelength];
 
 		public Board()
@@ -48,51 +43,52 @@ namespace Gomoku
 			whiteL = new List<Line>(20);
 			blackL = new List<Line>(20);
 		}
+
 		public Board(Board old, Position move)
 		{
 			Array.Copy(old.Field, Field, Sidelength * Sidelength);
 			Turn = old.Turn;
 
 			DoMove(move);
-			Eva = Evaluate();
 		}
 
 		public void DoMove(Position move)
 		{
-			Field[move.X, move.Y] = Turn ? Brick.Black : Brick.White;
+			Field[move.X, move.Y] = Turn;
 			FindLines();
 			LastMove = move;
 
-			Turn = !Turn;
+			Turn = Turn == Brick.White ? Brick.Black : Brick.White;
 		}
+
 		public List<Board> GetMoves()
 		{
 			if (Winner != Brick.Empty) return new List<Board>();
 
 			List<Board> list = new List<Board>(50);
-			for(int x = 0; x < Sidelength; x++)
+			for (int x = 0; x < Sidelength; x++)
 			{
 				for (int y = 0; y < Sidelength; y++)
 				{
-					if (Field[x,y] == Brick.Empty)
+					if (Field[x, y] == Brick.Empty)
 					{
-						if(x > 0)
+						if (x > 0)
 						{
-							if(Field[x - 1, y] != Brick.Empty)
+							if (Field[x - 1, y] != Brick.Empty)
 							{
 								list.Add(new Board(this, new Position(x, y)));
 								continue;
 							}
 
-							if(y > 0)
+							if (y > 0)
 							{
 								if ((byte)Field[x, y - 1] + (byte)Field[x - 1, y - 1] > 0)
 								{
 									list.Add(new Board(this, new Position(x, y)));
 									continue;
 								}
-							}	
-							if(y < Sidelength - 1)
+							}
+							if (y < Sidelength - 1)
 							{
 								if ((byte)Field[x, y + 1] + (byte)Field[x - 1, y + 1] > 0)
 								{
@@ -101,8 +97,8 @@ namespace Gomoku
 								}
 							}
 						}
-						
-						if(x < Sidelength - 1)
+
+						if (x < Sidelength - 1)
 						{
 							if (Field[x + 1, y] != Brick.Empty)
 							{
@@ -131,7 +127,7 @@ namespace Gomoku
 
 					if (list.Count > 0)
 					{
-						if(list.Last().Winner != Brick.Empty)
+						if (list.Last().Winner != Brick.Empty)
 						{
 							return new List<Board>(1) { list.Last() };
 						}
@@ -140,34 +136,37 @@ namespace Gomoku
 			}
 
 			return list;
-		}	
+		}
 
-		private double Evaluate()
+		public double Evaluate()
 		{
+			if (!double.IsNaN(Eva)) return Eva;
+
 			double v = 0;
 
 			int tCounter = 0;
-			foreach(Line line in whiteL)
+			foreach (Line line in whiteL)
 			{
 				v += EvaluateLine(line);
 			}
 
-			if (tCounter >= 2) v += 50;
+			if (tCounter >= 2) v += 10;
 			tCounter = 0;
 
 			foreach (Line line in blackL)
 			{
 				v -= EvaluateLine(line);
 			}
-			if (tCounter >= 2) v -= 50;
+			if (tCounter >= 2) v -= 10;
 
-			return v + (rnd.NextDouble()*2 -1) * 0;
+			Eva = v + (rnd.NextDouble() * 2 - 1) * 0;
+			return Eva;
 
 			double EvaluateLine(Line l)
-			{		
+			{
 				LineType t = CheckType(l);
 
-				switch(t & LineType.Length)
+				switch (t & LineType.Length)
 				{
 					case LineType.Double:
 						switch (t & LineType.Openness)
@@ -177,21 +176,23 @@ namespace Gomoku
 							case LineType.Closed: return 0.01;
 						}
 						break;
+
 					case LineType.Tripple:
-						switch(t & LineType.Openness)
+						switch (t & LineType.Openness)
 						{
 							case LineType.Open:
 								tCounter++;
 								return 10;
+
 							case LineType.Blocked: return 1;
 							case LineType.Closed: return 0.02;
 						}
 						break;
 
 					case LineType.Quad:
-						if((t & LineType.Smotheness) == LineType.Smothed)
+						if ((t & LineType.Smotheness) == LineType.Smothed)
 							return 4;
-						
+
 						switch (t & LineType.Openness)
 						{
 							case LineType.Open: return 100;
@@ -199,6 +200,7 @@ namespace Gomoku
 							case LineType.Closed: return 0.03;
 						}
 						break;
+
 					case LineType.Pent:
 						if ((t & LineType.Smotheness) == LineType.Smothed)
 							return 8;
@@ -274,7 +276,6 @@ namespace Gomoku
 
 				for (int j = 0; j < Sidelength; j++)
 				{
-
 					if (Field[i, j] == vBrick) vCount++;
 					else
 					{
@@ -325,7 +326,7 @@ namespace Gomoku
 							hCount = 0;
 						}
 
-							hBrick = Field[j, i];
+						hBrick = Field[j, i];
 						if (Field[j, i] != Brick.Empty)
 						{
 							hCount = 1;
@@ -350,7 +351,7 @@ namespace Gomoku
 					{
 						if (count > 1 && b != Brick.Empty)
 						{
-							if(count == 5)
+							if (count == 5)
 							{
 								Winner = b;
 							}
@@ -367,7 +368,7 @@ namespace Gomoku
 							count = 0;
 						}
 
-							b = Field[pos.X, pos.Y];
+						b = Field[pos.X, pos.Y];
 						if (Field[pos.X, pos.Y] != Brick.Empty)
 						{
 							count = 1;
@@ -376,7 +377,6 @@ namespace Gomoku
 
 					pos += new Position(1, 1);
 				}
-
 
 				pos = new Position(i % Sidelength, i > Sidelength ? 0 : Sidelength - 1);
 				if (i > Sidelength) pos.Swap();
@@ -416,32 +416,30 @@ namespace Gomoku
 					pos += new Position(1, -1);
 				}
 			}
-
-
 		}
 
 		public void Draw(Graphics g)
 		{
 			int d = 24;
 
-			for(int i = 0; i < Sidelength; i++)
+			for (int i = 0; i < Sidelength; i++)
 			{
-				g.DrawString(i.ToString(), new Font("Arial", 8f), Brushes.Black, i * drawSize + gOffset.X, 0);
+				g.DrawString(i.ToString(), new Font("Arial", 8f), Brushes.Black, i * drawSize + gOffset.X - 3, 0);
 				g.DrawString(i.ToString(), new Font("Arial", 8f), Brushes.Black, 0, i * drawSize + gOffset.Y / 2);
 
 				g.DrawLine(i == 5 || i == 11 ? Pens.Black : Pens.Gray, gOffset.X + i * drawSize, gOffset.Y, gOffset.X + i * drawSize, gOffset.Y + drawSize * (Sidelength - 1));
-				g.DrawLine(i == 5 || i == 11 ? Pens.Black : Pens.Gray, new Point(gOffset.X, gOffset.Y + i * drawSize), new Point(gOffset.Y + drawSize * (Sidelength - 1), gOffset.Y + i * drawSize));	
+				g.DrawLine(i == 5 || i == 11 ? Pens.Black : Pens.Gray, new Point(gOffset.X, gOffset.Y + i * drawSize), new Point(gOffset.Y + drawSize * (Sidelength - 1), gOffset.Y + i * drawSize));
 			}
 
-			for(int x = 0; x < Sidelength; x++)
+			for (int x = 0; x < Sidelength; x++)
 			{
 				for (int y = 0; y < Sidelength; y++)
 				{
 					if (Field[x, y] == Brick.White) g.FillEllipse(Brushes.White, new RectangleF(x * drawSize + gOffset.X - d / 2, y * drawSize + gOffset.Y - d / 2, d, d));
 					if (Field[x, y] == Brick.Black) g.FillEllipse(Brushes.Black, new RectangleF(x * drawSize + gOffset.X - d / 2, y * drawSize + gOffset.Y - d / 2, d, d));
+					if(new Position(x,y) == LastMove) g.DrawEllipse(Pens.Blue, new RectangleF(x * drawSize + gOffset.X - d / 2, y * drawSize + gOffset.Y - d / 2, d, d));
 				}
 			}
-
 
 			for (int i = 0; i < whiteL.Count; i++)
 			{
@@ -455,32 +453,33 @@ namespace Gomoku
 					blackL[i].End.X * drawSize + gOffset.X, blackL[i].End.Y * drawSize + gOffset.Y);
 			}
 		}
+
 		public void ParseMove(Point p)
 		{
 			//p -= gOffset;
 
-			if (p.X >= 0 && p.Y >= 0 && 
+			if (p.X >= 0 && p.Y >= 0 &&
 				p.X < Sidelength * drawSize && p.Y < Sidelength * drawSize)
 			{
 				Position move = new Position(p.X / drawSize, p.Y / drawSize);
-				Console.WriteLine(move);
+				Console.WriteLine(move + "\n");
 				DoMove(move);
 				Eva = Evaluate();
 
-				WriteData();
+				//WriteData();
 			}
 		}
 
 		public int CompareTo(Board other)
 		{
-			return Eva.CompareTo(other.Eva);
+			return Evaluate().CompareTo(other.Evaluate());
 		}
 
 		public void WriteData()
 		{
 			string s = "";
 
-			s += "Turn: " + (Turn ? "Black" : "White") + "\n"; 
+			s += "Turn: " + Turn.ToString() + "\n";
 			s += "Winner: " + Winner.ToString() + "\n";
 			s += "Eva: " + Eva.ToString("0.000") + "\n";
 			//for (int y = 0; y < Sidelength; y++)
@@ -500,13 +499,18 @@ namespace Gomoku
 			Console.WriteLine(s);
 		}
 
+		public override string ToString()
+		{
+			return LastMove.ToString() + " with " + Eva.ToString("0.000");
+		}
+
 		private class BrickList
 		{
 			public List<int>[] Bricks = new List<int>[Sidelength];
-			
+
 			public BrickList()
 			{
-				for(int i = 0; i < Sidelength; i++)
+				for (int i = 0; i < Sidelength; i++)
 				{
 					Bricks[i] = new List<int>(Sidelength);
 				}
@@ -516,28 +520,40 @@ namespace Gomoku
 			{
 				Bricks[p.X].Add(p.Y);
 			}
+
 			public bool Contains(Position p)
 			{
 				return Bricks[p.X].Contains(p.Y);
 			}
 		}
+
 		private class Line
 		{
 			public readonly Position Start, End;
-			public Position Normalized { get
-				{ return (End - Start).Sign(); } }
-			public int Length { get
+
+			public Position Normalized
+			{
+				get
+				{ return (End - Start).Sign(); }
+			}
+
+			public int Length
+			{
+				get
 				{
 					if (Start.X - End.X != 0) return Math.Abs(Start.X - End.X) + 1;
 					else return Math.Abs(Start.Y - End.Y) + 1;
-				} }
+				}
+			}
+
 			public readonly int Count;
 
 			public Line(int x, int y)
 			{
-				Start = new Position(x,y);
+				Start = new Position(x, y);
 				End = new Position(x, y);
 			}
+
 			public Line(Position start, Position end)
 			{
 				Start = start;
@@ -546,6 +562,7 @@ namespace Gomoku
 				if (Start.X - End.X != 0) Count = Math.Abs(Start.X - End.X) + 1;
 				else Count = Math.Abs(Start.Y - End.Y) + 1;
 			}
+
 			public Line(Position start, Position end, int count)
 			{
 				Start = start;
@@ -558,14 +575,9 @@ namespace Gomoku
 				return Start.ToString() + " -> " + End.ToString();
 			}
 		}
-
-		public override string ToString()
-		{
-			return LastMove.ToString() + " with " + Eva.ToString("0.000");
-		}
 	}
 
-	struct Position : IComparable<Position>
+	internal struct Position : IComparable<Position>
 	{
 		public short X, Y;
 
@@ -574,6 +586,7 @@ namespace Gomoku
 			X = (short)x;
 			Y = (short)y;
 		}
+
 		public Position(Point p)
 		{
 			X = (short)p.X;
@@ -587,15 +600,21 @@ namespace Gomoku
 			return X.CompareTo(other.X);
 		}
 
-		public Point ToPoint() { return new Point(X, Y); }
+		public Point ToPoint()
+		{
+			return new Point(X, Y);
+		}
+
 		public Position Sign()
 		{
 			return new Position(Math.Sign(X), Math.Sign(Y));
 		}
+
 		public int GausLength()
 		{
 			return Math.Abs(X) + Math.Abs(Y);
 		}
+
 		public void Swap()
 		{
 			short b = X;
@@ -607,6 +626,7 @@ namespace Gomoku
 		{
 			return new Position(a.X + b.X, a.Y + b.Y);
 		}
+
 		public static Position operator -(Position a, Position b)
 		{
 			return new Position(a.X - b.X, a.Y - b.Y);
@@ -621,6 +641,7 @@ namespace Gomoku
 		{
 			return a.X == b.X && a.Y == b.Y;
 		}
+
 		public static bool operator !=(Position a, Position b)
 		{
 			return !(a.X == b.X && a.Y == b.Y);
@@ -637,6 +658,7 @@ namespace Gomoku
 			return X == position.X &&
 				   Y == position.Y;
 		}
+
 		public override int GetHashCode()
 		{
 			return X ^ (Y << 8);
@@ -646,6 +668,5 @@ namespace Gomoku
 		{
 			return "{" + X.ToString("00") + " | " + Y.ToString("00") + "}";
 		}
-
 	}
 }

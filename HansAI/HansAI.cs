@@ -1,18 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Diagnostics;
 
 namespace Gomoku
 {
-	class HansAI
+	internal class HansAI
 	{
 		public static bool lost = false;
 		public static bool Version = false;
-		static double val = 0;
+		private static double val = 0;
 		public Board FinalBoard;
+
 		public HansAI(Board board)
 		{
 			lost = false;
@@ -20,22 +18,32 @@ namespace Gomoku
 			sw.Start();
 			FinalBoard = AlphaBetaV2.Solve(board);
 
+			if(val.ToString().Length > 30)
+			{
+
+			}
+
 			sw.Stop();
-			Console.WriteLine("Alpha:  " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000"));
+			Console.WriteLine("Alpha:  " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " in " + sw.ElapsedMilliseconds.ToString("000 000") + "\n");
 			if (FinalBoard.LastMove == new Position(-1, -1))
 			{
 				lost = true;
 			}
 		}
+
 		public HansAI(Board board, long time)
 		{
 			lost = false;
 			Stopwatch sw = new Stopwatch();
-			sw.Start();
-			FinalBoard = Jochen.Predict(board, time);
 
+			sw.Start();
+			Jochen.Initialize(board);
+			Jochen.Extend(time);
+
+			FinalBoard = Jochen.Tree.Best.board;
 			sw.Stop();
-			Console.WriteLine("Jochen: " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + " Depth: " + Jochen.Deepness.ToString());
+
+			Console.WriteLine("Jochen: " + board.Turn.ToString() + " " + FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + "\n");
 			if (FinalBoard.LastMove == new Position(-1, -1))
 			{
 				lost = true;
@@ -44,13 +52,14 @@ namespace Gomoku
 
 		private static class AlphaBetaV2
 		{
-			const int MaxDepth = 6;
-			static double Value = 0;
+			private const int MaxDepth = 6;
+			private static double Value = 0;
+
 			public static Board Solve(Board b)
 			{
 				Board ret = new Board();
 
-				if (b.Turn) Value = min(MaxDepth, double.MinValue, double.MaxValue, b);
+				if (b.Turn == Board.Brick.Black) Value = min(MaxDepth, double.MinValue, double.MaxValue, b);
 				else Value = max(MaxDepth, double.MinValue, double.MaxValue, b);
 
 				val = Value;
@@ -112,165 +121,222 @@ namespace Gomoku
 
 		private static class Jochen
 		{
-			const double FACTOR = 0.03;
-			public static int Iteration;
-			public static int Deepness;
-			static Random Rnd;
+			private const int MaxDepth = 4;
+			private const int BaseDepth = 2;
+			public static int Deepness = 0;
+			private static Stopwatch sw;
 
-			public static Board Predict(Board b, long maxTime)
+			private static int ITCount;
+			private const double Factor = 4.66920;
+
+			public static Root Tree;
+
+			public static void Initialize(Board b)
 			{
-				//Console.WriteLine("Hallo Welt");
-				Rnd = new Random();
+				sw = new Stopwatch();
+				sw.Start();
+
 				Deepness = 0;
-				long tickstart = Environment.TickCount;
 
-				Root r = new Root(b, !b.Turn, 1);
-				Board.Brick won = Board.Brick.Empty;
-				Iteration = 0;
-				while (Environment.TickCount - tickstart < maxTime && won == Board.Brick.Empty)
-				{
-					won = r.Visit();
-					Iteration++;
-				}
+				ITCount = 1;
+				Tree = new Root(b, 0);
+				//Console.WriteLine("depth 2 in " + sw.ElapsedMilliseconds.ToString("0,000"));
 
-				if (won != Board.Brick.Empty)
-				{
-					Console.WriteLine("Winner is " + won);
-					return new Board();
-				}
+				if (Tree.Winner != Board.Brick.Empty) Console.WriteLine("The Winner is " + Tree.Winner);
+				//else Console.WriteLine("Best so far: "  + Tree.Best.ToString());
 
-				return r.GetBest();
+				val = Tree.Best.Evaluation;
 			}
 
-
-			class Root : IComparable<Root>
+			public static void Extend(long time)
 			{
-				private double Value;
-				private double CTP;
-				public int VCount;
-				private bool Maximize;
-				int Depth = 0;
+				ITCount = 0;
+				while (sw.ElapsedMilliseconds < time && Tree.Winner == Board.Brick.Empty)
+				{
+					Tree.Visit();
+					ITCount++;
+				}
+				val = Tree.Best.Evaluation;
 
-				public Board.Brick currentWinner { get { return board.Winner; } }
+				Console.WriteLine("Deepness: " + Deepness.ToString());
+			}
 
-				private Board board;
+			public class Root : IComparable<Root>
+			{
+				public bool Maximize { get { return board.Turn == Board.Brick.White; } }
+
+				public Board.Brick Winner;
+				public Root Best;
+				public double Evaluation;
+				public readonly Board board;
+
+				private int Count;
+
+				private readonly int depth;
 				private List<Root> moves;
 
-				public Root(Board b, bool max, int depth)
+				public Root(Board b, int d)
 				{
+					Count = 1;
+
 					board = b;
-					Maximize = max;
+					depth = d;
 
-					VCount = 0;
-					Value = board.Eva;
+					if (depth > Deepness) Deepness = depth;
 
-					Depth = depth;
-					Deepness = Math.Max(Deepness, depth);
-				}
 
-				public Board.Brick Visit()
-				{
-					if (VCount == 0)
+					Winner = board.Winner;
+
+					Evaluation = board.Evaluate();
+
+					if (depth <= BaseDepth && Winner == Board.Brick.Empty)
 					{
-						moves = board.GetMoves().Select(x => new Root(x, !Maximize, Depth + 1)).ToList();
+						Count++;
+						List<Board> boards;
 
-						if (moves.Count > 0)
+						boards = board.GetMoves();
+
+						boards.Sort();
+						if (Maximize) boards.Reverse();
+
+						moves = new List<Root>(boards.Count);
+
+						for (int i = 0; i < boards.Count; i++)
 						{
-							for (int i = 0; i < moves.Count; i++)
+							Root r = new Root(boards[i], depth + 1);
+
+							if (r.Winner != Board.Brick.Empty)
 							{
-								if (moves[i].currentWinner != Board.Brick.Empty)
+								if (r.Winner == board.Turn)
 								{
-									moves = new List<Root>(1) { moves[i] };
-									return moves[0].currentWinner;
+									Winner = board.Turn;
+									Best = r;
+									moves = null;
+									return;
 								}
 							}
-						}
-					}
-					else
-					{
-						//Root best = Maximize ? moves.Max() : moves.Min();
-						Root best = moves.Min();
-						Board.Brick won = best.Visit();
-
-						if (won != Board.Brick.Empty)
-						{
-							if (won == (Maximize ? Board.Brick.White : Board.Brick.Black))
-							{
-								moves = new List<Root>(1) { best };
-								return won;
-							}
-							else
-							{
-								moves.Remove(best);
-							}
-						}
-					}
-
-					CalcVal();
-					VCount++;
-
-					return moves.Count > 0 ? Board.Brick.Empty : Maximize ? Board.Brick.Black : Board.Brick.White;
-
-					void CalcVal()
-					{
-						Value = Maximize ? double.MinValue : double.MaxValue;
-						for (int i = 0; i < moves.Count; i++)
-						{
-							if (Maximize) Value = Math.Max(Value, moves[i].Value);
-							else Value = Math.Min(Value, moves[i].Value);
+							else moves.Add(r);
 						}
 
-						if (Maximize) CTP = -Value * FACTOR + Math.Sqrt(VCount);
-						else CTP = Value * FACTOR + Math.Sqrt(VCount);
-					}
-				}
-
-				public Board GetBest()
-				{
-					Root ret = moves[Rnd.Next(moves.Count)];
-
-					for (int i = 0; i < moves.Count; i++)
-					{
-						if (Maximize)
+						if (moves.Count == 0)
 						{
-							if (moves[i].Value > ret.Value)
-							{
-								ret = moves[i];
-							}
+							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
 						}
 						else
 						{
-							if (moves[i].Value < ret.Value)
-							{
-								ret = moves[i];
-							}
+							FindBest();
+						}
+					}
+				}
+
+				public void FindBest()
+				{
+					Best = moves[0];
+					for (int i = 1; i < moves.Count; i++)
+					{
+						if (Maximize)
+						{
+							if (moves[i].Evaluation > Best.Evaluation) Best = moves[i];
+						}
+						else
+						{
+							if (moves[i].Evaluation < Best.Evaluation) Best = moves[i];
 						}
 					}
 
-					val = ret.Value;
-					return ret.board;
+					Evaluation = Best.Evaluation;
+				}
+
+				public bool Visit()
+				{
+					if(Count == 1)
+					{
+						List<Board> boards;
+
+						boards = board.GetMoves();
+
+						boards.Sort();
+						if (Maximize) boards.Reverse();
+
+						moves = new List<Root>(boards.Count);
+
+						for (int i = 0; i < boards.Count; i++)
+						{
+							Root r = new Root(boards[i], depth + 1);
+
+							if (r.Winner != Board.Brick.Empty)
+							{
+								if (r.Winner == board.Turn)
+								{
+									Winner = board.Turn;
+									Best = r;
+									moves = null;
+									return true;
+								}
+							}
+							else moves.Add(r);
+						}
+
+						if (moves.Count == 0)
+						{
+							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
+							return true;
+						}
+
+						FindBest();
+					}
+					else
+					{
+						double best = moves[0].GetUCB1();
+						int index = 0;
+
+						for(int i = 0; i < moves.Count; i++)
+						{
+							if(moves[i].GetUCB1() > best)
+							{
+								best = moves[i].GetUCB1();
+								index = i;
+							}
+						}
+
+						if (moves[index].Visit())
+						{
+							if (moves[index].Winner == board.Turn)
+							{
+								Winner = board.Turn;
+								Best = moves[index];
+								moves = null;
+								return true;
+							}
+							else moves.RemoveAt(index);
+						}
+
+						if (moves.Count == 0)
+						{
+							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
+							return true;
+						}
+
+						FindBest();
+					}
+
+					Count++;
+					return false;
+				}
+
+				public double GetUCB1()
+				{						//Cuz depth + 1
+					return Evaluation * (Maximize ? -1 : 1) / Count + Factor * Math.Sqrt(Math.Log(ITCount) / Count);
 				}
 
 				public int CompareTo(Root other)
 				{
-					if (Version)
-					{
-						return CTP.CompareTo(other.CTP);
-					}
-					else
-					{
-						if (VCount == other.VCount)
-						{
-							if (Maximize) return Value.CompareTo(other.Value);
-							else return -Value.CompareTo(other.Value);
-						}
-						else return VCount.CompareTo(other.VCount);
-					}
+					return Evaluation.CompareTo(other.Evaluation);
 				}
 
 				public override string ToString()
 				{
-					return board.LastMove + ", vCount: " + VCount.ToString("000") + " Value: " + Value.ToString("0.00");
+					return depth.ToString() + " -> " + board.LastMove.ToString() + " with " + Evaluation.ToString("000.000");
 				}
 			}
 		}
