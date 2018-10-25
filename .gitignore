@@ -1,0 +1,15 @@
+Gomoku.sln
+.vs/Gomoku/v15/Server/sqlite3/storage.ide-wal
+.vs/Gomoku/v15/.suo
+.vs/Gomoku/v15/Server/sqlite3/storage.ide
+HansAI/App.config
+HansAI/App.config
+HansAI/bin/Debug/Gomoku.exe
+HansAI/bin/Release/Gomoku.pdb
+*.exe
+*.pdb
+*.txt
+HansAI/obj/Debug/Gomoku.csproj.GenerateResource.cache
+*.exe
+HansAI/obj/Debug/Gomoku.pdb
+*.exe

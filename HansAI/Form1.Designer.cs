@@ -29,11 +29,12 @@
 		private void InitializeComponent()
 		{
 			this.BEngine1 = new System.Windows.Forms.Button();
+			this.BReset = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// BEngine1
 			// 
-			this.BEngine1.Location = new System.Drawing.Point(635, 12);
+			this.BEngine1.Location = new System.Drawing.Point(569, 12);
 			this.BEngine1.Name = "BEngine1";
 			this.BEngine1.Size = new System.Drawing.Size(75, 23);
 			this.BEngine1.TabIndex = 0;
@@ -41,11 +42,22 @@
 			this.BEngine1.UseVisualStyleBackColor = true;
 			this.BEngine1.Click += new System.EventHandler(this.BEngine1_Click);
 			// 
+			// BReset
+			// 
+			this.BReset.Location = new System.Drawing.Point(569, 59);
+			this.BReset.Name = "BReset";
+			this.BReset.Size = new System.Drawing.Size(75, 23);
+			this.BReset.TabIndex = 1;
+			this.BReset.Text = "Reset";
+			this.BReset.UseVisualStyleBackColor = true;
+			this.BReset.Click += new System.EventHandler(this.BReset_Click);
+			// 
 			// Screen
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(722, 536);
+			this.ClientSize = new System.Drawing.Size(662, 536);
+			this.Controls.Add(this.BReset);
 			this.Controls.Add(this.BEngine1);
 			this.Name = "Screen";
 			this.Text = "BestGameEu";
@@ -59,6 +71,7 @@
 		#endregion
 
 		private System.Windows.Forms.Button BEngine1;
+		private System.Windows.Forms.Button BReset;
 	}
 }
 

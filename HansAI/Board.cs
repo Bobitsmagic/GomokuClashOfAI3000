@@ -28,7 +28,7 @@ namespace Gomoku
 			Smothed = 16
 		}
 
-		public const int Sidelength = 17;
+		public const int Sidelength = 15;
 
 		public double Eva = double.NaN;
 		public Brick Turn = Brick.White;
@@ -36,16 +36,27 @@ namespace Gomoku
 		public Position LastMove = new Position(-1, -1);
 
 		private List<Line> whiteL, blackL;
-		public Brick[,] Field = new Brick[Sidelength, Sidelength];
+
+		private List<Position> whiteMoves, blackMoves;
+		private Brick[,] Field = new Brick[Sidelength, Sidelength];
 
 		public Board()
 		{
 			whiteL = new List<Line>(20);
 			blackL = new List<Line>(20);
+
+			whiteMoves = new List<Position>(50);
+			blackMoves = new List<Position>(50);
 		}
 
 		public Board(Board old, Position move)
 		{
+			whiteMoves = new List<Position>(50);
+			whiteMoves.AddRange(old.whiteMoves);
+
+			blackMoves = new List<Position>(50);
+			blackMoves.AddRange(old.blackMoves);
+
 			Array.Copy(old.Field, Field, Sidelength * Sidelength);
 			Turn = old.Turn;
 
@@ -54,6 +65,9 @@ namespace Gomoku
 
 		public void DoMove(Position move)
 		{
+			if (Turn == Brick.White) whiteMoves.Add(move);
+			else blackMoves.Add(move);
+
 			Field[move.X, move.Y] = Turn;
 			FindLines();
 			LastMove = move;
@@ -142,27 +156,68 @@ namespace Gomoku
 		{
 			if (!double.IsNaN(Eva)) return Eva;
 
-			double v = 0;
+			Eva = 0;
 
+			//Lines
 			int tCounter = 0;
 			foreach (Line line in whiteL)
 			{
-				v += EvaluateLine(line);
+				Eva += EvaluateLine(line, Turn == Brick.White);
 			}
 
-			if (tCounter >= 2) v += 10;
+			if (tCounter >= 2) Eva += 4;
 			tCounter = 0;
 
 			foreach (Line line in blackL)
 			{
-				v -= EvaluateLine(line);
+				Eva -= EvaluateLine(line, Turn == Brick.Black);
 			}
-			if (tCounter >= 2) v -= 10;
+			if (tCounter >= 2) Eva -= 4;
 
-			Eva = v + (rnd.NextDouble() * 2 - 1) * 0;
+			//Openess
+			double avgWx = 0, avgWy = 0, avgBx = 0, avgBy = 0;
+			for(int i = 0; i < whiteMoves.Count; i++)
+			{
+				avgWx += whiteMoves[i].X;
+				avgWy += whiteMoves[i].Y;
+			}
+			for (int i = 0; i < blackMoves.Count; i++)
+			{
+				avgBx += blackMoves[i].X;
+				avgBy += blackMoves[i].Y;
+			}
+			avgWx /= whiteMoves.Count;
+			avgWy /= whiteMoves.Count;
+
+			avgBx /= blackMoves.Count;
+			avgBy /= blackMoves.Count;
+
+			double varW = 0, varB = 0;
+			for (int i = 0; i < whiteMoves.Count; i++)
+			{
+				varW += (avgWx - whiteMoves[i].X) * (avgWx - whiteMoves[i].X) +
+					(avgWy - whiteMoves[i].Y) * (avgWy - whiteMoves[i].Y);
+			}
+			for (int i = 0; i < blackMoves.Count; i++)
+			{
+				varB += (avgBx - blackMoves[i].X) * (avgBx - blackMoves[i].X) +
+					(avgBy - blackMoves[i].Y) * (avgBy - blackMoves[i].Y);
+			}
+
+			varW /= whiteMoves.Count;
+			varB /= blackMoves.Count;
+
+			Eva += (varW - varB) * 0.1;
+			Eva += (rnd.NextDouble() * 2 - 1) * 0.01;
 			return Eva;
 
-			double EvaluateLine(Line l)
+			/* X| open	blocked	closed	smoothed
+			 * 2| 1		0.2		-0.03	~
+			 * 3| 4/0.5 0.3		-0.02	same	 
+			 * 4| 10	9/0.6	-0.01  	10/0.7	
+			 * 5| 1000	1000	1000
+			 */
+			double EvaluateLine(Line l, bool myTurn)
 			{
 				LineType t = CheckType(l);
 
@@ -171,8 +226,8 @@ namespace Gomoku
 					case LineType.Double:
 						switch (t & LineType.Openness)
 						{
-							case LineType.Open: return 3;
-							case LineType.Blocked: return 0.4;
+							case LineType.Open: return 1;
+							case LineType.Blocked: return 0.2;
 							case LineType.Closed: return 0.01;
 						}
 						break;
@@ -182,28 +237,28 @@ namespace Gomoku
 						{
 							case LineType.Open:
 								tCounter++;
-								return 10;
+								return myTurn ? 4 : 0.1;
 
-							case LineType.Blocked: return 1;
+							case LineType.Blocked: return 0.3;
 							case LineType.Closed: return 0.02;
 						}
 						break;
 
 					case LineType.Quad:
 						if ((t & LineType.Smotheness) == LineType.Smothed)
-							return 4;
+							return myTurn ? 10 : 0.7;
 
 						switch (t & LineType.Openness)
 						{
-							case LineType.Open: return 100;
-							case LineType.Blocked: return 9;
-							case LineType.Closed: return 0.03;
+							case LineType.Open: return 10;
+							case LineType.Blocked: return myTurn ? 9 : 0.2;
+							case LineType.Closed: return -0.04;
 						}
 						break;
 
 					case LineType.Pent:
 						if ((t & LineType.Smotheness) == LineType.Smothed)
-							return 8;
+							return 10;
 
 						return 1234;
 				}
@@ -227,10 +282,20 @@ namespace Gomoku
 						//try extend
 						if (pos.X >= 0 && pos.Y >= 0 && pos.X < Sidelength && pos.Y < Sidelength)
 						{
-							if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y])
+							if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y] && l.Count < 4)
 							{
+								count--;
 								type += 1;
 								type |= LineType.Smothed;
+
+								pos += l.Normalized;
+
+								if (pos.X >= 0 && pos.Y >= 0 && pos.X < Sidelength && pos.Y < Sidelength)
+								{
+									if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y])
+										count++;
+									
+								}
 							}
 						}
 					}
@@ -247,10 +312,19 @@ namespace Gomoku
 						//try extend
 						if (pos.X >= 0 && pos.Y >= 0 && pos.X < Sidelength && pos.Y < Sidelength)
 						{
-							if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y])
+							if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y] && l.Count < 4 && (type & LineType.Smotheness) == LineType.Double)
 							{
+								count--;
 								type += 1;
 								type |= LineType.Smothed;
+
+								pos -= l.Normalized;
+
+								if (pos.X >= 0 && pos.Y >= 0 && pos.X < Sidelength && pos.Y < Sidelength)
+								{
+									if (Field[pos.X, pos.Y] == Field[l.Start.X, l.Start.Y])
+										count++;
+								}
 							}
 						}
 					}
@@ -427,8 +501,8 @@ namespace Gomoku
 				g.DrawString(i.ToString(), new Font("Arial", 8f), Brushes.Black, i * drawSize + gOffset.X - 3, 0);
 				g.DrawString(i.ToString(), new Font("Arial", 8f), Brushes.Black, 0, i * drawSize + gOffset.Y / 2);
 
-				g.DrawLine(i == 5 || i == 11 ? Pens.Black : Pens.Gray, gOffset.X + i * drawSize, gOffset.Y, gOffset.X + i * drawSize, gOffset.Y + drawSize * (Sidelength - 1));
-				g.DrawLine(i == 5 || i == 11 ? Pens.Black : Pens.Gray, new Point(gOffset.X, gOffset.Y + i * drawSize), new Point(gOffset.Y + drawSize * (Sidelength - 1), gOffset.Y + i * drawSize));
+				g.DrawLine(i == 4 || i == 10 ? Pens.Black : Pens.Gray, gOffset.X + i * drawSize, gOffset.Y, gOffset.X + i * drawSize, gOffset.Y + drawSize * (Sidelength - 1));
+				g.DrawLine(i == 4 || i == 10 ? Pens.Black : Pens.Gray, new Point(gOffset.X, gOffset.Y + i * drawSize), new Point(gOffset.Y + drawSize * (Sidelength - 1), gOffset.Y + i * drawSize));
 			}
 
 			for (int x = 0; x < Sidelength; x++)
@@ -441,17 +515,17 @@ namespace Gomoku
 				}
 			}
 
-			for (int i = 0; i < whiteL.Count; i++)
-			{
-				g.DrawLine(Pens.Red, whiteL[i].Start.X * drawSize + gOffset.X, whiteL[i].Start.Y * drawSize + gOffset.Y,
-					whiteL[i].End.X * drawSize + gOffset.X, whiteL[i].End.Y * drawSize + gOffset.Y);
-			}
+			//for (int i = 0; i < whiteL.Count; i++)
+			//{
+			//	g.DrawLine(Pens.Red, whiteL[i].Start.X * drawSize + gOffset.X, whiteL[i].Start.Y * drawSize + gOffset.Y,
+			//		whiteL[i].End.X * drawSize + gOffset.X, whiteL[i].End.Y * drawSize + gOffset.Y);
+			//}
 
-			for (int i = 0; i < blackL.Count; i++)
-			{
-				g.DrawLine(Pens.Red, blackL[i].Start.X * drawSize + gOffset.X, blackL[i].Start.Y * drawSize + gOffset.Y,
-					blackL[i].End.X * drawSize + gOffset.X, blackL[i].End.Y * drawSize + gOffset.Y);
-			}
+			//for (int i = 0; i < blackL.Count; i++)
+			//{
+			//	g.DrawLine(Pens.Red, blackL[i].Start.X * drawSize + gOffset.X, blackL[i].Start.Y * drawSize + gOffset.Y,
+			//		blackL[i].End.X * drawSize + gOffset.X, blackL[i].End.Y * drawSize + gOffset.Y);
+			//}
 		}
 
 		public void ParseMove(Point p)
@@ -579,18 +653,18 @@ namespace Gomoku
 
 	internal struct Position : IComparable<Position>
 	{
-		public short X, Y;
+		public sbyte X, Y;
 
 		public Position(int x, int y)
 		{
-			X = (short)x;
-			Y = (short)y;
+			X = (sbyte)x;
+			Y = (sbyte)y;
 		}
 
 		public Position(Point p)
 		{
-			X = (short)p.X;
-			Y = (short)p.Y;
+			X = (sbyte)p.X;
+			Y = (sbyte)p.Y;
 		}
 
 		public int CompareTo(Position other)
@@ -614,10 +688,18 @@ namespace Gomoku
 		{
 			return Math.Abs(X) + Math.Abs(Y);
 		}
+		public double EuclideLength()
+		{
+			return Math.Sqrt(X * X + Y * Y);
+		}
+		public double EuclideLengthSquared()
+		{
+			return X * X + Y * Y;
+		}
 
 		public void Swap()
 		{
-			short b = X;
+			sbyte b = X;
 			X = Y;
 			Y = b;
 		}
@@ -632,7 +714,7 @@ namespace Gomoku
 			return new Position(a.X - b.X, a.Y - b.Y);
 		}
 
-		public static Position operator *(Position a, int s)
+		public static Position operator *(int s, Position a)
 		{
 			return new Position(a.X * s, a.Y * s);
 		}

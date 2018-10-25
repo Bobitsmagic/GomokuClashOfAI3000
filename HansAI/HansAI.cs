@@ -127,7 +127,7 @@ namespace Gomoku
 			private static Stopwatch sw;
 
 			private static int ITCount;
-			private const double Factor = 4.66920;
+			private const double Factor = 2;
 
 			public static Root Tree;
 
@@ -151,7 +151,7 @@ namespace Gomoku
 			public static void Extend(long time)
 			{
 				ITCount = 0;
-				while (sw.ElapsedMilliseconds < time && Tree.Winner == Board.Brick.Empty)
+				while (sw.ElapsedMilliseconds < time && Tree.Winner == Board.Brick.Empty && Tree.moves.Count > 1)
 				{
 					Tree.Visit();
 					ITCount++;
@@ -172,8 +172,10 @@ namespace Gomoku
 
 				private int Count;
 
+				private double worst, range;
+
 				private readonly int depth;
-				private List<Root> moves;
+				public List<Root> moves;
 
 				public Root(Board b, int d)
 				{
@@ -232,24 +234,27 @@ namespace Gomoku
 				public void FindBest()
 				{
 					Best = moves[0];
+					worst = Best.Evaluation;
 					for (int i = 1; i < moves.Count; i++)
 					{
 						if (Maximize)
 						{
 							if (moves[i].Evaluation > Best.Evaluation) Best = moves[i];
+							if (moves[i].Evaluation < worst) worst = moves[i].Evaluation;
 						}
 						else
 						{
 							if (moves[i].Evaluation < Best.Evaluation) Best = moves[i];
+							if (moves[i].Evaluation > worst) worst = moves[i].Evaluation;
 						}
 					}
-
+					range = Best.Evaluation - worst;
 					Evaluation = Best.Evaluation;
 				}
 
 				public bool Visit()
 				{
-					if(Count == 1)
+					if (Count == 1)
 					{
 						List<Board> boards;
 
@@ -282,19 +287,17 @@ namespace Gomoku
 							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
 							return true;
 						}
-
-						FindBest();
 					}
 					else
 					{
-						double best = moves[0].GetUCB1();
+						double best = moves[0].GetUCB1(worst, range);
 						int index = 0;
 
-						for(int i = 0; i < moves.Count; i++)
+						for (int i = 0; i < moves.Count; i++)
 						{
-							if(moves[i].GetUCB1() > best)
+							if (moves[i].GetUCB1(worst, range) > best)
 							{
-								best = moves[i].GetUCB1();
+								best = moves[i].GetUCB1(worst, range);
 								index = i;
 							}
 						}
@@ -316,17 +319,17 @@ namespace Gomoku
 							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
 							return true;
 						}
-
-						FindBest();
 					}
+
+					FindBest();
 
 					Count++;
 					return false;
 				}
 
-				public double GetUCB1()
-				{						//Cuz depth + 1
-					return Evaluation * (Maximize ? -1 : 1) / Count + Factor * Math.Sqrt(Math.Log(ITCount) / Count);
+				public double GetUCB1(double min, double range)
+				{
+					return (Evaluation - min) / range / Count + Factor * Math.Sqrt(Math.Log(ITCount) / Count);
 				}
 
 				public int CompareTo(Root other)
