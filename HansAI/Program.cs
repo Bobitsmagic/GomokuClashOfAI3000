@@ -29,8 +29,8 @@ namespace Gomoku
 
 			while (true)
 			{
-				while (File.ReadAllText(path) == lastGame) Thread.Sleep(50);
 
+				while (CheckFile()) Thread.Sleep(50);
 
 				b = new Board(path);
 				//b.WriteData();
@@ -43,6 +43,18 @@ namespace Gomoku
 
 				File.WriteAllText(path, lastGame);
 				Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + lastGame);
+			}
+
+			bool CheckFile()
+			{
+				try
+				{
+					return File.ReadAllText(path) == lastGame;
+				}
+				catch
+				{
+					return false;
+				}
 			}
 		}
 

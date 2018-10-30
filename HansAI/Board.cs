@@ -59,7 +59,7 @@ namespace Gomoku
 
 			for(int i = 0; i < s.Length; i+= 2)
 			{
-				if ((i & 3) <= 1) whiteMoves.Add(new Position(s[i], s[i + 1]));
+				if ((i & 2) == 0) whiteMoves.Add(new Position(s[i], s[i + 1]));
 				else blackMoves.Add(new Position(s[i], s[i + 1]));
 			}
 
@@ -795,7 +795,7 @@ namespace Gomoku
 		public Position(char x, char y)
 		{
 			X = (sbyte)chars.IndexOf(x);
-			Y = (sbyte)chars.IndexOf(x);
+			Y = (sbyte)chars.IndexOf(y);
 		}
 
 		public int CompareTo(Position other)
