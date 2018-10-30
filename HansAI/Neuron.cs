@@ -1,32 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gomoku
 {
-	class Neuron
+	internal class Neuron
 	{
 		//Statics
 		public static double Lernrate = 0.1, Momentum = 0.03, Sat = -0.01;
+
 		private static Random rnd = new Random();
+
 		//Public Data
 		public double Output { get; private set; }
+
 		public double Error { get; private set; }
 		public double Saturation { get; private set; }
 
-		public double Bias { get { return bias; } }
-		public double[] Weights { get { return weights; } }
+		public double Bias { get; private set; }
+		public double[] Weights { get; }
 
 		//private Data
 		private Network refNetwork;
+
 		private int layer, index;
 
-		private double bias, deltaBias;
-		private double[] weights, deltaWeights;
+		private double deltaBias;
+		private double[] deltaWeights;
 
 		//Constructor
 		public Neuron(Network network, int _layer, int _index)
@@ -37,12 +36,13 @@ namespace Gomoku
 
 			if (layer != 0)
 			{
-				weights = new double[network.Neurons[layer - 1].Length];
-				deltaWeights = new double[weights.Length];
+				Weights = new double[network.Neurons[layer - 1].Length];
+				deltaWeights = new double[Weights.Length];
 
 				SetRandomWeights();
 			}
 		}
+
 		public Neuron(Network network, int _layer, int _index, ref BinaryReader br)
 		{
 			refNetwork = network;
@@ -51,46 +51,43 @@ namespace Gomoku
 
 			if (layer != 0)
 			{
-				weights = new double[network.Neurons[layer - 1].Length];
-				deltaWeights = new double[weights.Length];
+				Weights = new double[network.Neurons[layer - 1].Length];
+				deltaWeights = new double[Weights.Length];
 			}
 
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
-				weights[i] = br.ReadDouble();
+				Weights[i] = br.ReadDouble();
 				deltaWeights[i] = br.ReadDouble();
 			}
 
-			bias = br.ReadDouble();
+			Bias = br.ReadDouble();
 			deltaBias = br.ReadDouble();
 		}
 
 		//IO
 		public void WriteAsFile(ref BinaryWriter bw)
 		{
-			//weigths[], deltaWights[]
-			//bias, deltaBias
-
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
-				bw.Write(weights[i]);
+				bw.Write(Weights[i]);
 				bw.Write(deltaWeights[i]);
 			}
 
-			bw.Write(bias);
+			bw.Write(Bias);
 			bw.Write(deltaBias);
 		}
 
 		//Voids
 		public void SetRandomWeights()
 		{
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
-				weights[i] = NextGaussian();
+				Weights[i] = NextGaussian();
 				deltaWeights[i] = 0;
 			}
 
-			bias = NextGaussian();
+			Bias = NextGaussian();
 			deltaBias = 0;
 		}
 
@@ -100,48 +97,42 @@ namespace Gomoku
 				Math.Sin(2 * Math.PI * rnd.NextDouble());
 		}
 
-		double theta = 7;
+		private double theta = 7;
+
 		public bool FlipSign()
 		{
-			int wi = rnd.Next(weights.Length + 1);
-			for (int i = 0; i <= weights.Length; i++)
+			int wi = rnd.Next(Weights.Length + 1);
+			for (int i = 0; i <= Weights.Length; i++)
 			{
-				if (wi == weights.Length)
+				if (wi == Weights.Length)
 				{
-					if (Math.Abs(bias) > theta)
+					if (Math.Abs(Bias) > theta)
 					{
-						bias = NextGaussian();
+						Bias = NextGaussian();
 						return true;
 					}
 				}
 				else
 				{
-					if (Math.Abs(weights[wi]) > theta)
+					if (Math.Abs(Weights[wi]) > theta)
 					{
-						weights[wi] = NextGaussian();
+						Weights[wi] = NextGaussian();
 						return true;
 					}
 				}
 
-				wi = (wi + 1) % (weights.Length + 1);
+				wi = (wi + 1) % (Weights.Length + 1);
 			}
 
 			return false;
 		}
-		public PointF[] GetHyperPlane()
-		{
-			PointF a = new PointF((float)(Bias / Weights[0]), 0);
-			PointF b = new PointF(0, (float)(Bias / Weights[1]));
-
-			return new PointF[] { a, b };
-		}
 
 		public void CalcOut()
 		{
-			double sum = bias;
-			for (int i = 0; i < weights.Length; i++)
+			double sum = Bias;
+			for (int i = 0; i < Weights.Length; i++)
 			{
-				sum += refNetwork.Neurons[layer - 1][i].Output * weights[i];
+				sum += refNetwork.Neurons[layer - 1][i].Output * Weights[i];
 			}
 
 			Output = Sigmoid(sum);
@@ -149,6 +140,7 @@ namespace Gomoku
 
 			//Console.WriteLine("CalcOut on layer {0}, index {1}: in={2} out = {3}", layer, index, sum.ToString("0.000"), Output.ToString("0.000"));
 		}
+
 		public void CalcOut(double input)
 		{
 			Output = Sigmoid(input);
@@ -165,12 +157,12 @@ namespace Gomoku
 			{
 				//w * phi'(eingabe) * error
 				Error += refNetwork.Neurons[layer + 1][i].Error *
-					refNetwork.Neurons[layer + 1][i].weights[index] *
+					refNetwork.Neurons[layer + 1][i].Weights[index] *
 					SigmoidDer(refNetwork.Neurons[layer + 1][i].Output);
 			}
 			double constFactor = Error * SigmoidDer(Output);
 
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
 				deltaWeights[i] += refNetwork.Neurons[layer - 1][i].Output * constFactor
 									+ Sat * refNetwork.Neurons[layer - 1][i].Output * SatFuncDer(Output) * Saturation;
@@ -178,13 +170,14 @@ namespace Gomoku
 
 			deltaBias += constFactor + Sat * SatFuncDer(Output) * Saturation;
 		}
+
 		public void CalcDW(double error)
 		{
 			//error * SigmoidDer(output) * lernrate
 			Error = error;
 			double constFactor = Error * SigmoidDer(Output);
 
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
 				deltaWeights[i] += refNetwork.Neurons[layer - 1][i].Output * constFactor
 					+ Sat * refNetwork.Neurons[layer - 1][i].Output * SatFuncDer(Output) * Saturation;
@@ -195,12 +188,12 @@ namespace Gomoku
 
 		public void ApplyDW(int testCount)
 		{
-			for (int i = 0; i < weights.Length; i++)
+			for (int i = 0; i < Weights.Length; i++)
 			{
-				weights[i] += Lernrate * deltaWeights[i] / testCount;
+				Weights[i] += Lernrate * deltaWeights[i] / testCount;
 				deltaWeights[i] *= Momentum;
 			}
-			bias += deltaBias * Lernrate / testCount;
+			Bias += deltaBias * Lernrate / testCount;
 			deltaBias *= Momentum;
 		}
 
@@ -208,18 +201,22 @@ namespace Gomoku
 		{
 			return 1 / (1 + (double)Math.Exp(-x));
 		}
+
 		public static double SigmoidDer(double y)
 		{
 			return y * (1 - y);
 		}
+
 		public static double SigmoidInv(double y)
 		{
 			return Math.Log(-y / (y - 1));
 		}
+
 		public static double SatFunc(double y)
 		{
 			return 1 - 4 * SigmoidDer(y);
 		}
+
 		public static double SatFuncDer(double y)
 		{
 			return -4 * SigmoidDer(y) * (-2 * y + 1);

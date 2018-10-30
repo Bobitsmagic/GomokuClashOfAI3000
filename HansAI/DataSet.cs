@@ -1,26 +1,26 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Gomoku
 {
 	public class DataSet
 	{
-		const double MAxValue = 3;
+		private const double MAxValue = 3;
 
 		//Propertys
 		public int SetNumber { get { return InputSet.Length; } }
+
 		public int InputSize { get { return InputSet[0].Length; } }
 		public int OutputSize { get { return OutputSet[0].Length; } }
 
 		//Data
 		public double[][] InputSet;
+
 		public double[][] OutputSet;
 
 		public string[] Name;
+
 		//Constructor
 		/// <summary>
 		/// Creates a Dataset from .txt-file.
@@ -55,11 +55,11 @@ namespace Gomoku
 				{
 					OutputSet[i][j] = double.Parse(ValueBuffer[j]);
 				}
-
 			}
 
 			Console.WriteLine("Initialized DataSet on:\n" + path + "\n" + ToString());
 		}
+
 		public DataSet(int number, int inSize, int outSize)
 		{
 			InputSet = new double[number][];
@@ -71,8 +71,8 @@ namespace Gomoku
 				InputSet[i] = new double[inSize];
 				OutputSet[i] = new double[outSize];
 			}
-
 		}
+
 		public static DataSet XOR()
 		{
 			DataSet ret = new DataSet(4, 2, 1);
@@ -88,8 +88,8 @@ namespace Gomoku
 
 			ret.NormalizeInput();
 			return ret;
-
 		}
+
 		public static DataSet Easy()
 		{
 			DataSet ret = new DataSet(2, 1, 1);
@@ -232,6 +232,7 @@ namespace Gomoku
 
 			return ret;
 		}
+
 		public static DataSet Digits(string path)
 		{
 			StreamReader sr = new StreamReader(path);
@@ -269,6 +270,7 @@ namespace Gomoku
 			input = InputSet[i];
 			output = OutputSet[i];
 		}
+
 		//Overrides
 		public override string ToString()
 		{
