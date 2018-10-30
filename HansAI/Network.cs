@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Gomoku
 {
-	class Network
+	internal class Network
 	{
 		public int InputSize { get { return Neurons[0].Length; } }
 		public int OutputSize { get { return Neurons.Last().Length; } }
@@ -33,6 +30,7 @@ namespace Gomoku
 				}
 			}
 		}
+
 		public Network(string path)
 		{
 			Stream s = File.OpenRead(path);
@@ -85,6 +83,7 @@ namespace Gomoku
 
 			bw.Close();
 		}
+
 		private void FlipRndSign()
 		{
 			Console.Write("Try to jump ");
@@ -94,7 +93,6 @@ namespace Gomoku
 				int ni = rnd.Next(Neurons[layer].Length);
 				for (int j = 0; j < Neurons[layer].Length; j++)
 				{
-
 					if (Neurons[layer][ni].FlipSign())
 					{
 						Console.WriteLine("Did jump!");
@@ -132,6 +130,7 @@ namespace Gomoku
 		{
 			return Neurons[Neurons.Length - 1][index].Output;
 		}
+
 		public double[] GetOutput()
 		{
 			double[] ret = new double[OutputSize];
@@ -144,6 +143,7 @@ namespace Gomoku
 
 			return ret;
 		}
+
 		public double[] GetOutput(double[] data)
 		{
 			SetInput(data);
@@ -187,6 +187,7 @@ namespace Gomoku
 
 			return errorSum * 0.5;
 		}
+
 		private double Train(DataSet dataSet, List<int> toUse)
 		{
 			double errorSum = 0, errorBuffer;
@@ -247,6 +248,7 @@ namespace Gomoku
 
 			return ret;
 		}
+
 		public double DoSession(DataSet data, int count, int sampleSize)
 		{
 			double ret = 0;
@@ -268,7 +270,6 @@ namespace Gomoku
 					if (Console.CursorTop != 0) Console.CursorTop = Console.CursorTop - 1;
 					Console.WriteLine(i);
 
-
 					//Utility.G.DrawImage(DrawNetwork(), 512, 0);
 					//Utility.G.DrawImage(MapNetwork(5), 0, 0);
 					//Utility.G.DrawImage(DrawHyperplanes(data), 256, 0);
@@ -276,7 +277,6 @@ namespace Gomoku
 
 				if (ShuffleList.Count == 0) ShuffleList = Enumerable.Range(0, data.SetNumber).ToList();
 			}
-
 
 			//WriteOutput(data);
 
@@ -286,7 +286,6 @@ namespace Gomoku
 
 			return ret;
 		}
-
 
 		public List<int> CountErrors(DataSet data, double precision)
 		{
@@ -299,7 +298,6 @@ namespace Gomoku
 				{
 					if (Math.Abs(buffer[j] - data.OutputSet[i][j]) > precision)
 					{
-
 						ret.Add(i);
 						return ret;
 						break;
@@ -309,6 +307,7 @@ namespace Gomoku
 
 			return ret;
 		}
+
 		public void WriteOutput(DataSet data)
 		{
 			Console.CursorTop = 0;

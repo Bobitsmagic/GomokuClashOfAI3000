@@ -30,33 +30,45 @@
 		{
 			this.BEngine1 = new System.Windows.Forms.Button();
 			this.BReset = new System.Windows.Forms.Button();
+			this.BStatistics = new System.Windows.Forms.Button();
 			this.SuspendLayout();
 			// 
 			// BEngine1
 			// 
-			this.BEngine1.Location = new System.Drawing.Point(569, 12);
+			this.BEngine1.Location = new System.Drawing.Point(483, 12);
 			this.BEngine1.Name = "BEngine1";
-			this.BEngine1.Size = new System.Drawing.Size(75, 23);
+			this.BEngine1.Size = new System.Drawing.Size(161, 99);
 			this.BEngine1.TabIndex = 0;
-			this.BEngine1.Text = "Eva1";
+			this.BEngine1.Text = "DoEngineMove!";
 			this.BEngine1.UseVisualStyleBackColor = true;
 			this.BEngine1.Click += new System.EventHandler(this.BEngine1_Click);
 			// 
 			// BReset
 			// 
-			this.BReset.Location = new System.Drawing.Point(569, 59);
+			this.BReset.Location = new System.Drawing.Point(605, 409);
 			this.BReset.Name = "BReset";
-			this.BReset.Size = new System.Drawing.Size(75, 23);
+			this.BReset.Size = new System.Drawing.Size(45, 23);
 			this.BReset.TabIndex = 1;
 			this.BReset.Text = "Reset";
 			this.BReset.UseVisualStyleBackColor = true;
 			this.BReset.Click += new System.EventHandler(this.BReset_Click);
 			// 
+			// BStatistics
+			// 
+			this.BStatistics.Location = new System.Drawing.Point(483, 136);
+			this.BStatistics.Name = "BStatistics";
+			this.BStatistics.Size = new System.Drawing.Size(161, 30);
+			this.BStatistics.TabIndex = 2;
+			this.BStatistics.Text = "DataZeugs";
+			this.BStatistics.UseVisualStyleBackColor = true;
+			this.BStatistics.Click += new System.EventHandler(this.BStatistics_Click);
+			// 
 			// Screen
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-			this.ClientSize = new System.Drawing.Size(662, 536);
+			this.ClientSize = new System.Drawing.Size(662, 444);
+			this.Controls.Add(this.BStatistics);
 			this.Controls.Add(this.BReset);
 			this.Controls.Add(this.BEngine1);
 			this.Name = "Screen";
@@ -72,6 +84,7 @@
 
 		private System.Windows.Forms.Button BEngine1;
 		private System.Windows.Forms.Button BReset;
+		private System.Windows.Forms.Button BStatistics;
 	}
 }
 

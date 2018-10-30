@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 
 namespace Gomoku
@@ -20,14 +24,13 @@ namespace Gomoku
 
 		private void Screen_Paint(object sender, PaintEventArgs e)
 		{
-			b.Draw(e.Graphics);
+			b?.Draw(e.Graphics);
 		}
 
 		private void Screen_MouseClick(object sender, MouseEventArgs e)
 		{
 			//b.ParseMove(e.Location);
 			//Refresh();
-
 
 			int max = 0;
 			while (true)
@@ -41,12 +44,11 @@ namespace Gomoku
 				{
 					Application.DoEvents();
 
-					Console.Write(i++ + " ");
 					HansAI bob = new HansAI(b, 5000);
 					b = bob.FinalBoard;
 					Refresh();
 
-					Console.Write(i++ + " ");
+					if (b == null) break;
 					bob = new HansAI(b, 5000);
 					b = bob.FinalBoard;
 					Refresh();
@@ -58,7 +60,7 @@ namespace Gomoku
 
 		private void BEngine1_Click(object sender, EventArgs e)
 		{
-			HansAI bob = new HansAI(b, 3000);
+			HansAI bob = new HansAI(b, 5000);
 			b = bob.FinalBoard;
 			Refresh();
 		}
@@ -66,6 +68,49 @@ namespace Gomoku
 		private void BReset_Click(object sender, EventArgs e)
 		{
 			b = new Board();
+			Refresh();
+		}
+
+		private void BStatistics_Click(object sender, EventArgs e)
+		{
+			Random rnd = new Random();
+
+			Stopwatch sw = new Stopwatch();
+			sw.Start();
+			const int mc = 100;
+
+			int[] count = new int[mc];
+			double[] vals = new double[mc];
+			
+			while(sw.ElapsedMilliseconds < 3 * 60000)
+			{
+				Board b = new Board();
+				b.DoMove(new Position(7, 7));
+				for(int i = 0; i< mc && b.Winner == Board.Brick.Empty; i++)
+				{
+					List<Board> boards = b.GetNearMoves();
+
+					count[i]++;
+					vals[i] += boards.Count;
+
+					b = boards[rnd.Next(boards.Count)];
+				}
+			}
+
+			string s = "";
+			for(int i = 0; i < mc; i++)
+			{
+				if(count[i] == 0)
+				{
+					vals = vals.Take(i).ToArray();
+					Console.WriteLine("Longest: " + i);
+					break;
+				}
+				s += i + "\t" + vals[i] / count[i] + "\n";
+			}
+			File.WriteAllText(@"C:\Users\Martin\Desktop\out.txt", s);
+
+			Console.WriteLine("Done");
 		}
 	}
 }
