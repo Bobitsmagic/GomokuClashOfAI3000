@@ -9,10 +9,10 @@ namespace Gomoku
 	{
 		private static void Main(string[] args)
 		{
-			string path = args[0];
-			bool starts = args[1] == "B";
-			//string path = Console.ReadLine();
-			//bool starts = Console.ReadLine() == "B";
+			//string path = args[0];
+			//bool starts = args[1] == "B";
+			string path = Console.ReadLine();
+			bool starts = Console.ReadLine() == "B";
 
 			Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
@@ -42,7 +42,7 @@ namespace Gomoku
 				lastGame = b.GetMoveString();
 
 				File.WriteAllText(path, lastGame);
-				Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + lastGame);
+				Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
 			}
 
 			bool CheckFile()
@@ -51,8 +51,9 @@ namespace Gomoku
 				{
 					return File.ReadAllText(path) == lastGame;
 				}
-				catch
+				catch(Exception e)
 				{
+					Console.WriteLine("[HansAI]: Catched: " + e.ToString());
 					return false;
 				}
 			}
