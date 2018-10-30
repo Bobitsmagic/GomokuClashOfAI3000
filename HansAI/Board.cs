@@ -68,6 +68,8 @@ namespace Gomoku
 				if ((i & 1) == 0) Field[whiteMoves[i / 2].X, whiteMoves[i / 2].Y] = Brick.White;
 				else Field[blackMoves[i / 2].X, blackMoves[i / 2].Y] = Brick.Black;
 			}
+
+			FindLines();
 		}
 
 		public Board(Board old, Position move)
