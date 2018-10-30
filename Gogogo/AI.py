@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
 import random
+from datetime import datetime
+random.seed(datetime.now())
 
 from .Board import Board
 from .Tactic import Tactic
@@ -18,7 +20,7 @@ class AI:
         self.saveFile = saveFile
 
     def move(self):
-        print("About to move with history: " + self.board.history)
+        #print("[GOGOGO]: About to move with history: " + self.board.history)
         status = None
         # Always prioritize the middle
         # [TODO] If middle isn't available attempt to play close instead
@@ -39,7 +41,7 @@ class AI:
             status = self.board.place(x, y, self.stone)
 
         with open(self.saveFile, "w") as fh:
-            print("Writing this history: " + self.board.history)
+            #print("[GOGOGO]: Writing this history: " + self.board.history)
             fh.write(self.board.history)
 
         if status == None:

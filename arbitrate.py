@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import os
+import time
 import subprocess
 
 from Gogogo.Board import Board
@@ -16,7 +17,8 @@ gogogo = AI(gogogo_board, "B", saveFile = saveFile)
 #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
 HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-command = HansAI_loc + " " + saveFile + " " + "W"
+difficulty = 100
+command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty)
 process = subprocess.Popen(command, shell = True)
 HansAI = None
 
@@ -24,10 +26,8 @@ b = gogogo
 w = HansAI
 
 turn = 0
-turns = 1
+turns = -1
 winner = None
-board = Board()
-board.render(history = False)
 while winner == None and (turn < turns or turns == -1):
     gameState = open(saveFile, "r").read()
 
@@ -61,20 +61,34 @@ while winner == None and (turn < turns or turns == -1):
     board.render()
     """
 
+    # [TODO] Make this work elegantly so that we can randomize B/W initializing
+
     b.move()
+    with open(saveFile, "r") as fh: gameState = fh.read()
+
+    start = os.stat(saveFile).st_mtime
+    playerMoved = False
+    while playerMoved == False:
+        try:
+            now = os.stat(saveFile).st_mtime
+        except Exception:
+            pass
+        if now - start != 0: playerMoved = True
+
     with open(saveFile, "r") as fh: gameState = fh.read()
     board = Board()
     board.processCode(gameState)
     b.board = board
 
-    start = os.stat(saveFile).st_mtime
-    playerMoved = False
-    while playerMoved == False:
-        now = os.stat(saveFile).st_mtime
-        if now - start != 0: playerMoved = True
+    board.render()
 
     if board.winner != None:
         winner = board.winner
         break
 
     turn += 1
+
+if winner == b:
+    print("Black is the victor!")
+else:
+    print("White is the victor!")
