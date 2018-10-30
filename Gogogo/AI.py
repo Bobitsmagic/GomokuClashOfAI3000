@@ -18,6 +18,7 @@ class AI:
         self.saveFile = saveFile
 
     def move(self):
+        print("About to move with history: " + self.board.history)
         status = None
         # Always prioritize the middle
         # [TODO] If middle isn't available attempt to play close instead
@@ -37,9 +38,9 @@ class AI:
             y = random.randint(0, self.board.h)
             status = self.board.place(x, y, self.stone)
 
-        fh = open(self.saveFile, "w")
-        fh.write(self.board.history)
-        fh.close()
+        with open(self.saveFile, "w") as fh:
+            print("Writing this history: " + self.board.history)
+            fh.write(self.board.history)
 
         if status == None:
             return self.move()

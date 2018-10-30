@@ -50,11 +50,13 @@ class Board:
         return True
 
     def processCode(self, code):
+        print("Processing code: " + code)
         # [TODO] Get this to more elegantly process code
         stone = B
         for d in range(0, len(code), 2):
             x = ALPHABET.index(code[d + 0].upper())
             y = ALPHABET.index(code[d + 1].upper())
+            #print("1st {} 2nd {}".format(code[d + 0], code[d + 1]))
 
             if self.place(x, y, stone) == None:
                 return None
@@ -62,6 +64,7 @@ class Board:
             if False: pass
             elif stone == B: stone = W
             elif stone == W: stone = B
+        print("This was the code processed: " + self.history)
 
     @property
     def winner(self):
