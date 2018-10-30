@@ -24,7 +24,7 @@ b = gogogo
 w = HansAI
 
 turn = 0
-turns = -1
+turns = 4
 winner = None
 board = Board()
 board.render(history = False)
