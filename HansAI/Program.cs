@@ -11,6 +11,7 @@ namespace Gomoku
 		{
 			string path = args[0];
 			bool starts = args[1] == "B";
+			int time = int.Parse(args[2]);
 			//string path = Console.ReadLine();
 			//bool starts = Console.ReadLine() == "B";
 
@@ -36,6 +37,7 @@ namespace Gomoku
 				//b.WriteData();
 
 				HansAI bob = new HansAI(b, 2000);
+				if (bob.FinalBoard == null) break;
 				b = bob.FinalBoard;
 
 				//b.WriteData();
