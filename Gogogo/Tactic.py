@@ -56,7 +56,7 @@ class Tactic:
 
         # [LEFTOFF] Currently it does not select a random piece that already hasn't been played in the pattern...
         # Get it to do this
-        print("Found a match with a percentage of {}".format(bestMatchPercent))
+        #print("Found a match with a percentage of {}".format(bestMatchPercent))
         return bestMatch
 
     # [TODO] Fix this so that it ACTUALLY works all the time...

@@ -14,7 +14,7 @@ class Board:
         self.board = [[E] * self.w for i in range(self.h)]
         self.history = ""
 
-    def render(self):
+    def render(self, history = True):
         for y in range(self.h):
             for x in range(self.w):
                 stone = self.getStone(x, y)
@@ -23,6 +23,8 @@ class Board:
                     icon = icons[stone]
                 print(icon, end = "")
             print()
+        if history: print(self.history)
+        print()
 
     def getStone(self, x, y):
         if x < 0 or y < 0 or x >= self.w or y >= self.h:
