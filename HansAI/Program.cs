@@ -36,7 +36,7 @@ namespace Gomoku
 				b = new Board(path);
 				//b.WriteData();
 
-				HansAI bob = new HansAI(b, 2000);
+				HansAI bob = new HansAI(b, time);
 				if (bob.FinalBoard == null) break;
 				b = bob.FinalBoard;
 
