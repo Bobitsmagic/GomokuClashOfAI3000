@@ -39,6 +39,11 @@ class Board:
     def place(self, x, y, stone):
         if self.getStone(x, y) != E: return None
 
+        #existing = self.board[y][x]
+        #if existing != E:
+        #    print("[ERROR] Space not empty, cheating detected!!!")
+        #    return False
+
         self.board[y][x] = stone
 
         self.history = self.history + ALPHABET[x] + ALPHABET[y]

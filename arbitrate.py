@@ -13,12 +13,12 @@ with open(saveFile, "w") as fh: fh.write("")
 # [TODO] Make this randomly select between stone colors instead of hardcoded
 gogogo_board = Board()
 gogogo = AI(gogogo_board, "B", saveFile = saveFile)
-HansAI = AI(gogogo_board, "W", saveFile = saveFile)
+#HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
-#HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-#command = HansAI_loc + " " + saveFile + " " + "W"
-#process = subprocess.Popen(command, shell = True)
-#HansAI = None
+HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
+command = HansAI_loc + " " + saveFile + " " + "W"
+process = subprocess.Popen(command, shell = True)
+HansAI = None
 
 b = gogogo
 w = HansAI
