@@ -9,10 +9,10 @@ namespace Gomoku
 	{
 		private static void Main(string[] args)
 		{
-			//string path = args[0];
-			//bool starts = args[1] == "B";
-			string path = Console.ReadLine();
-			bool starts = Console.ReadLine() == "B";
+			string path = args[0];
+			bool starts = args[1] == "B";
+			//string path = Console.ReadLine();
+			//bool starts = Console.ReadLine() == "B";
 
 			Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
