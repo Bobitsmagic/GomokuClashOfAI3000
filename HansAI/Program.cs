@@ -11,25 +11,38 @@ namespace Gomoku
 		{
 			string path = args[0];
 			bool starts = args[1] == "B";
+			//string path = Console.ReadLine();
+			//bool starts = Console.ReadLine() == "B";
+
+			Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
 			Board b = new Board();
-			if (starts) b.DoMove(new Position(6, 6));
+			if (starts)
+			{
+				b.DoMove(new Position(6, 6));
+				File.WriteAllText(path, b.GetMoveString());
+				Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + b.GetMoveString());
+			}
 
 			string lastGame = b.GetMoveString();
 
-			File.WriteAllText(path, lastGame);
 
 			while (true)
 			{
 				while (File.ReadAllText(path) == lastGame) Thread.Sleep(50);
+
+
 				b = new Board(path);
+				//b.WriteData();
 
 				HansAI bob = new HansAI(b, 2000);
 				b = bob.FinalBoard;
 
+				//b.WriteData();
 				lastGame = b.GetMoveString();
 
 				File.WriteAllText(path, lastGame);
+				Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + lastGame);
 			}
 		}
 
