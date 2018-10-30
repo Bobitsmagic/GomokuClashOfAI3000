@@ -7,10 +7,10 @@ namespace Gomoku
 {
 	internal static class Program
 	{
-		private static void Main()
+		private static void Main(string[] args)
 		{
-			string path = Console.ReadLine();
-			bool starts = Console.ReadLine() == "B";
+			string path = args[0];
+			bool starts = args[1] == "B";
 
 			Board b = new Board();
 			if (starts) b.DoMove(new Position(6, 6));
