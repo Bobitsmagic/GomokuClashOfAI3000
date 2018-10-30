@@ -50,7 +50,6 @@ class Board:
         return True
 
     def processCode(self, code):
-        print("Attempting to process code " + code)
         # [TODO] Get this to more elegantly process code
         stone = B
         for d in range(0, len(code), 2):

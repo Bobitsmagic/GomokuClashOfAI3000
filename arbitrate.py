@@ -24,30 +24,28 @@ b = gogogo
 w = HansAI
 
 turn = 0
-turns = 4
+turns = -1
 winner = None
 board = Board()
 board.render(history = False)
 while winner == None and (turn < turns or turns == -1):
     gameState = open(saveFile, "r").read()
 
-    #print("b moving", board.history)
+    start = os.stat(saveFile).st_mtime
     if b is not None: b.move()
     playerMoved = False
     while playerMoved == False:
-        currentState = open(saveFile, "r").read()
-        if currentState != gameState: playerMoved = True
-    gameState = open(saveFile, "r").read()
-    #print("b moved")
+        now = os.stat(saveFile).st_mtime
+        if now - start != 0: playerMoved = True
+    with open(saveFile, "r") as fh: gameState = fh.read()
 
-    #print("w moving", board.history)
+    start = os.stat(saveFile).st_mtime
     if w is not None: w.move()
     playerMoved = False
     while playerMoved == False:
-        currentState = open(saveFile, "r").read()
-        if currentState != gameState: playerMoved = True
-    gameState = open(saveFile, "r").read()
-    #print("w moved")
+        now = os.stat(saveFile).st_mtime
+        if now - start != 0: playerMoved = True
+    with open(saveFile, "r") as fh: gameState = fh.read()
 
     board = Board()
     board.processCode(gameState)
