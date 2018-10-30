@@ -9,11 +9,13 @@ from Gogogo.AI import AI
 
 saveFile = "../game.gom"
 saveFile = os.path.abspath(saveFile)
+
 with open(saveFile, "w") as fh: fh.write("")
 
 # [TODO] Make this randomly select between stone colors instead of hardcoded
 gogogo_board = Board()
-gogogo = AI(gogogo_board, "B", saveFile = saveFile)
+#gogogo = AI(gogogo_board, "B", saveFile = saveFile, verbose = True)
+gogogo = AI(gogogo_board, "B", saveFile = saveFile, verbose = True)
 #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
 HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")

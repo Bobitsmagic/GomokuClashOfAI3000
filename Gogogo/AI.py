@@ -14,13 +14,23 @@ W = "W"
 tactic = Tactic()
 
 class AI:
-    def __init__(self, board, stone, saveFile):
+    def __init__(self, board, stone, saveFile, verbose = False):
         self.board = board
         self.stone = stone
         self.saveFile = saveFile
+        self.verbose = verbose
+
+    def saveHistory(self):
+        try:
+            with open(self.saveFile, "w") as fh:
+                fh.write(self.board.history)
+                return True
+        except:
+            pass
+
+        self.saveHistory()
 
     def move(self):
-        #print("[GOGOGO]: About to move with history: " + self.board.history)
         status = None
         # Always prioritize the middle
         # [TODO] If middle isn't available attempt to play close instead
@@ -40,9 +50,7 @@ class AI:
             y = random.randint(0, self.board.h)
             status = self.board.place(x, y, self.stone)
 
-        with open(self.saveFile, "w") as fh:
-            #print("[GOGOGO]: Writing this history: " + self.board.history)
-            fh.write(self.board.history)
+        self.saveHistory()
 
         if status == None:
             return self.move()

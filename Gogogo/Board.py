@@ -8,11 +8,12 @@ icons = {E: ". ", B: "B ", W: "W "}
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 class Board:
-    def __init__(self):
+    def __init__(self, verbose = False):
         self.w = 15
         self.h = 15
         self.board = [[E] * self.w for i in range(self.h)]
         self.history = ""
+        self.verbose = verbose
 
     def render(self, history = True):
         for y in range(self.h):
