@@ -18,3 +18,13 @@ C:\Users\Martin\Desktop\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csproj.Gen
 C:\Users\Martin\Desktop\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csproj.CoreCompileInputs.cache
 C:\Users\Martin\Desktop\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.exe
 C:\Users\Martin\Desktop\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.pdb
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\bin\Release\Gomoku.exe.config
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\bin\Release\Gomoku.exe
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\bin\Release\Gomoku.pdb
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csprojAssemblyReference.cache
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.Screen.resources
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.Properties.Resources.resources
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csproj.GenerateResource.cache
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csproj.CoreCompileInputs.cache
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.exe
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.pdb

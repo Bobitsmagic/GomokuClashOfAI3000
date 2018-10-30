@@ -126,7 +126,7 @@ namespace Gomoku
 			private static Stopwatch sw;
 
 			private static int ITCount;
-			private const double Factor = .41;
+			private const double Factor = .14;
 
 			public static Root Tree;
 
