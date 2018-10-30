@@ -52,7 +52,10 @@ namespace Gomoku
 		}
 		public Board(string path)
 		{
-			string s = File.ReadAllText(path);
+
+			string s = "";
+			
+			while(!CheckFile()) { }
 
 			whiteMoves = new List<Position>(200);
 			blackMoves = new List<Position>(200);
@@ -73,6 +76,19 @@ namespace Gomoku
 			else Turn = Brick.Black;
 
 			FindLines();
+
+			bool CheckFile()
+			{
+				try
+				{
+					s = File.ReadAllText(path);
+					return true;
+				}
+				catch (Exception e)
+				{
+					return false;
+				}
+			}
 		}
 
 		public Board(Board old, Position move)

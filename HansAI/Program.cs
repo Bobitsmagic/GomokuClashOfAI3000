@@ -43,7 +43,8 @@ namespace Gomoku
 				//b.WriteData();
 				lastGame = b.GetMoveString();
 
-				while(!WriteFile())  Thread.Sleep(10); 
+				while(!WriteFile())  Thread.Sleep(10);
+
 				Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
 			}
 
