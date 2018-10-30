@@ -69,6 +69,9 @@ namespace Gomoku
 				else Field[blackMoves[i / 2].X, blackMoves[i / 2].Y] = Brick.Black;
 			}
 
+			if (MoveCount % 2 == 0) Turn = Brick.White;
+			else Turn = Brick.Black;
+
 			FindLines();
 		}
 
@@ -660,19 +663,19 @@ namespace Gomoku
 			s += "Turn: " + Turn.ToString() + "\n";
 			s += "Winner: " + Winner.ToString() + "\n";
 			s += "Eva: " + Eva.ToString("0.000") + "\n";
-			//for (int y = 0; y < Sidelength; y++)
-			//{
-			//	for(int x = 0; x < Sidelength; x++)
-			//	{
-			//		switch (Field[x, y])
-			//		{
-			//			case Brick.White: s += "O"; break;
-			//			case Brick.Black: s += "X"; break;
-			//			case Brick.Empty: s += "#"; break;
-			//		}
-			//	}
-			//	s += "\n";
-			//}
+			for (int y = 0; y < Sidelength; y++)
+			{
+				for (int x = 0; x < Sidelength; x++)
+				{
+					switch (Field[x, y])
+					{
+						case Brick.White: s += "O"; break;
+						case Brick.Black: s += "X"; break;
+						case Brick.Empty: s += "#"; break;
+					}
+				}
+				s += "\n";
+			}
 
 			Console.WriteLine(s);
 		}
@@ -836,8 +839,6 @@ namespace Gomoku
 
 		public string ByranFormat()
 		{
-			
-
 			return chars[X].ToString() + chars[Y].ToString();			
 		}
 
