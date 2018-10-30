@@ -37,27 +37,27 @@ class Board:
         return stone
 
     def place(self, x, y, stone):
-        if self.getStone(x, y) != E:
-            return None
+        if self.getStone(x, y) != E: return None
 
         self.board[y][x] = stone
-        self.history = self.history + ALPHABET[x] + ALPHABET[y] + stone
+
+        self.history = self.history + ALPHABET[x] + ALPHABET[y]
         return True
 
     def processCode(self, code):
-        n = 3
-        if type(code) != str or len(code) % 3 != 0:
-            print("[WARN] Code must be a string with length in multiples of {}".format(n))
-            return None
+        print("Attempting to process code " + code)
+        # [TODO] Get this to more elegantly process code
+        stone = B
+        for d in range(0, len(code), 2):
+            x = ALPHABET.index(code[d + 0].upper())
+            y = ALPHABET.index(code[d + 1].upper())
 
-        snippets = [code[i * n:(i + 1) * n] for i in range(len(code) + n - 1) // n]
-        for snippet in snippets:
-            x = ALPHABET.index(snippet[0].upper())
-            y = ALPHABET.index(snippet[1].upper())
-            s = snippet[2]
-
-            if self.place(x, y, s) == None:
+            if self.place(x, y, stone) == None:
                 return None
+
+            if False: pass
+            elif stone == B: stone = W
+            elif stone == W: stone = B
 
     @property
     def winner(self):
