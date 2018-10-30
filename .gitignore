@@ -1,3 +1,5 @@
+__pycache__/
+*.py[cod]
 Gomoku.sln
 .vs/Gomoku/v15/Server/sqlite3/storage.ide-wal
 .vs/Gomoku/v15/.suo

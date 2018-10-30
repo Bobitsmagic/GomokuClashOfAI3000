@@ -5,7 +5,7 @@ import os
 from Gogogo.Board import Board
 from Gogogo.AI import AI
 
-saveFile = "../../game.gom"
+saveFile = "../game.gom"
 saveFile = os.path.abspath(saveFile)
 with open(saveFile, "w") as fh: fh.write("")
 
