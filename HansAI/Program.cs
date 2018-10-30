@@ -43,7 +43,7 @@ namespace Gomoku
 				//b.WriteData();
 				lastGame = b.GetMoveString();
 
-				File.WriteAllText(path, lastGame);
+				while(!WriteFile())  Thread.Sleep(10); 
 				Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
 			}
 
@@ -55,7 +55,21 @@ namespace Gomoku
 				}
 				catch(Exception e)
 				{
-					Console.WriteLine("[HansAI]: Catched: " + e.ToString());
+					//Console.WriteLine("[HansAI]: Catched: " + e.ToString());
+					return false;
+				}
+			}
+
+			bool WriteFile()
+			{
+				try
+				{
+					File.WriteAllText(path, lastGame);
+					return true;
+				}
+				catch (Exception e)
+				{
+					//Console.WriteLine("[HansAI]: Catched: " + e.ToString());
 					return false;
 				}
 			}
