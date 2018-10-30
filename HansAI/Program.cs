@@ -16,6 +16,9 @@ namespace Gomoku
 			if (starts) b.DoMove(new Position(6, 6));
 
 			string lastGame = b.GetMoveString();
+
+			File.WriteAllText(path, lastGame);
+
 			while (true)
 			{
 				while (File.ReadAllText(path) == lastGame) Thread.Sleep(50);
