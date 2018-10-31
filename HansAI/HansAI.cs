@@ -145,7 +145,7 @@ namespace Gomoku
 				Tree = new Root(b, 0);
 				//Console.WriteLine("depth 1 in " + sw.ElapsedMilliseconds.ToString("0,000"));
 
-				if (Tree.Winner != Board.Brick.Empty) Console.WriteLine("The Winner is " + Tree.Winner);
+				//if (Tree.Winner != Board.Brick.Empty) Console.WriteLine("The Winner is " + Tree.Winner);
 				//else Console.WriteLine("Best so far: "  + Tree.Best.ToString());
 
 				if(Tree.Best != null)
