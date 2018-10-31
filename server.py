@@ -56,8 +56,6 @@ class Server:
 
         if action == "register":
             return self.processQuery_register(data)
-        elif action == "ingame":
-            return self.processQuery_ingame(data)
 
         return None
 
@@ -69,20 +67,6 @@ class Server:
             return json.dumps({"query": "register", "username": username, "state": "success"})
         else:
             return json.dumps({"query": "register", "username": username, "state": "fail"})
-
-        return None
-
-    def processAction_ingame(self, data):
-        username = data["username"]
-
-        game = None
-        for activeGame in self.activeGames:
-            if username in activeGame["players"]:
-                game = activeGame
-                break
-
-        if game is not None:
-            return json.dumps({"query": "ingame", "username": username, "state": "success", "game": game["name"]})
 
         return None
 

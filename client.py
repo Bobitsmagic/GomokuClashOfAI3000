@@ -52,9 +52,5 @@ class Client:
         finally:
             pass
 
-    def findGame(self):
-        if not self.registered: return False
-
 a = Client(username = str(random.randint(0, 10000)), verbose = True)
-a.findGame()
 #b = Client(username = "b", verbose = True)
