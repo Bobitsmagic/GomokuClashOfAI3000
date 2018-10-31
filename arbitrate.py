@@ -7,20 +7,29 @@ import subprocess
 from Gogogo.Board import Board
 from Gogogo.AI import AI
 
+def savestate(filename, state):
+    try:
+        with open(filename, "w") as fh:
+            fh.write(state)
+            return True
+    except:
+        pass
+
+    return savestate(filename, state)
+
 for game in range(100):
     saveFile = "../game.gom"
     saveFile = os.path.abspath(saveFile)
 
-    with open(saveFile, "w") as fh: fh.write("")
+    savestate(saveFile, "")
 
     # [TODO] Make this randomly select between stone colors instead of hardcoded
     gogogo_board = Board()
-    #gogogo = AI(gogogo_board, "B", saveFile = saveFile, verbose = True)
     gogogo = AI(gogogo_board, "B", saveFile = saveFile, verbose = True)
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 100
+    difficulty = 10
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 0"
     process = subprocess.Popen(command, shell = True)
     HansAI = None
@@ -66,10 +75,6 @@ for game in range(100):
     scoreFile = "../score.txt"
     scoreFile = os.path.abspath(scoreFile)
     with open(scoreFile, "a") as fh:
-        if winner == b:
-            #print("Game {} winner: {}")
-            print("Black is the victor!")
-            fh.write("Winner B {}\n".format(winnerCode))
-        else:
-            print("White is the victor!")
-            fh.write("Winner W {}\n".format(winnerCode))
+        print(game)
+        string = "Game {} winner {} {}\n".format(game, winner, winnerCode)
+        fh.write(string)
