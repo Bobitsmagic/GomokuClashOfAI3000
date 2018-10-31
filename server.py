@@ -4,49 +4,87 @@ import socket
 import json
 import sys
 
-sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+class Server:
+    def __init__(self):
+        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server_address = ("localhost", 9000)
+        print("Starting server on {} port {}".format(*server_address))
+        self.sock.bind(server_address)
+        self.sock.listen(1)
 
-server_address = ("localhost", 9000)
-print("Starting server on {} port {}".format(*server_address))
-sock.bind(server_address)
-sock.listen(1)
+        self.activePlayers = []
+        self.activeGames = []
 
-activePlayers = []
+    def run(self):
+        while True:
+            print("Waiting for a connection...\n")
+            connection = None
 
-while True:
-    print("Waiting for a connection...\n")
-    connection = None
+            try:
+                connection, client_address = self.sock.accept()
+                # [TODO] Associate this connection with whatever use that is
+                # This allows the server to close broken connections
+                print("Connection from " + str(client_address))
 
-    try:
-        connection, client_address = sock.accept()
-        print("Connection from " + str(client_address))
+                # [TODO] Determine if 1024 is not long enough for long games
+                data = connection.recv(1024).decode()
+                data = json.loads(data)
 
-        data = connection.recv(1024).decode()
-        data = json.loads(data)
+                reply = None
 
-        reply = None
+                if "query" in data:
+                    if data["query"] == "register":
+                        reply = self.processQuery(data)
 
-        if "action" in data:
-            if data["action"] == "register":
-                username = data["username"]
-                print("User attempting to register with name " + username)
-                if username not in activePlayers:
-                    activePlayers.append(username)
-                    reply = json.dumps({"action": "register", "username": username, "state": "success"})
-                else:
-                    reply = json.dumps({"action": "register", "username": username, "state": "fail"})
+                if reply == None:
+                    print("Failed to process request: " + str(data))
+                    reply = json.dumps({"response": "bad"})
 
-        if reply == None:
-            print("Failed to process request: " + str(data))
-            reply = json.dumps({"response": "bad"})
+                print("Sending: " + reply)
+                connection.sendall(reply.encode())
 
-        print("Sending: " + reply)
-        connection.sendall(reply.encode())
+            except KeyboardInterrupt:
+                print("Interrupt received, stopping...")
+                if connection: connection.close()
+                break
 
-    except KeyboardInterrupt:
-        print("Interrupt received, stopping...")
-        if connection: connection.close()
-        break
+            finally:
+                if connection: connection.close()
 
-    finally:
-        if connection: connection.close()
+    def processQuery(self, data):
+        action = data["query"]
+
+        if action == "register":
+            return self.processQuery_register(data)
+        elif action == "ingame":
+            return self.processQuery_ingame(data)
+
+        return None
+
+    def processQuery_register(self, data):
+        username = data["username"]
+        print("User attempting to register with name " + username)
+        if username not in self.activePlayers:
+            self.activePlayers.append(username)
+            return json.dumps({"query": "register", "username": username, "state": "success"})
+        else:
+            return json.dumps({"query": "register", "username": username, "state": "fail"})
+
+        return None
+
+    def processAction_ingame(self, data):
+        username = data["username"]
+
+        game = None
+        for activeGame in self.activeGames:
+            if username in activeGame["players"]:
+                game = activeGame
+                break
+
+        if game is not None:
+            return json.dumps({"query": "ingame", "username": username, "state": "success", "game": game["name"]})
+
+        return None
+
+server = Server()
+server.run()
