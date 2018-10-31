@@ -63,7 +63,7 @@ for game in range(100):
         board.processCode(gameState)
         b.board = board
 
-        #board.render()
+        board.render()
 
         if board.winner != None:
             winner = board.winner
