@@ -27,3 +27,4 @@ C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.cspro
 C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csproj.CoreCompileInputs.cache
 C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.exe
 C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.pdb
+C:\Users\Martin\Desktop\Baum\GomokuClashOfAI3000\HansAI\obj\Release\Gomoku.csprojAssemblyReference.cache
