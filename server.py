@@ -1,55 +1,49 @@
-#!/usr/bin/env python3
-
-import socket
+from twisted.internet import reactor, protocol
 import json
-import sys
 
-class Server:
-    def __init__(self):
-        self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server_address = ("localhost", 9000)
-        print("Starting server on {} port {}".format(*server_address))
-        self.sock.bind(server_address)
-        self.sock.listen(1)
+# [TODO] Figure out if this is the proper global place to place these
+verbose = False
+activePlayers = []
+lobbyPlayers = []
+activeMatches = []
 
-        self.activePlayers = []
-        self.activeGames = []
+def findMatch():
+    print("Attempting to find a match")
+    if len(lobbyPlayers) >= 2:
+        a = lobbyPlayers[0]
+        b = lobbyPlayers[1]
+        lobbyPlayers.remove(a)
+        lobbyPlayers.remove(b)
+        activePlayers.append(a)
+        activePlayers.append(b)
+        createMatch(a, b)
 
-    def run(self):
-        while True:
-            print("Waiting for a connection...\n")
-            connection = None
+def createMatch(playerA, playerB):
+    print("Match started between {} and {}".format(playerA, playerB))
 
-            try:
-                connection, client_address = self.sock.accept()
-                # [TODO] Associate this connection with whatever use that is
-                # This allows the server to close broken connections
-                print("Connection from " + str(client_address))
+class Server(protocol.Protocol):
+    def dataReceived(self, data):
+        reply = None
 
-                # [TODO] Determine if 1024 is not long enough for long games
-                data = connection.recv(1024).decode()
-                data = json.loads(data)
+        try:
+            data = data.decode()
+            data = json.loads(data)
+            if verbose: print("Received\n" + str(data))
 
-                reply = None
+            if "query" in data:
+                if data["query"] == "register":
+                    reply = self.processQuery(data)
+        except:
+            print("Recieved incorrect JSON\n\t" + str(data))
+        finally:
+            if reply == None:
+                reply = json.dumps({"response": "bad"})
 
-                if "query" in data:
-                    if data["query"] == "register":
-                        reply = self.processQuery(data)
+            self.sendData(reply)
 
-                if reply == None:
-                    print("Failed to process request: " + str(data))
-                    reply = json.dumps({"response": "bad"})
-
-                print("Sending: " + reply)
-                connection.sendall(reply.encode())
-
-            except KeyboardInterrupt:
-                print("Interrupt received, stopping...")
-                if connection: connection.close()
-                break
-
-            finally:
-                if connection: connection.close()
+    def sendData(self, data):
+        if verbose: print("Sending\n\t" + data)
+        self.transport.write(data.encode())
 
     def processQuery(self, data):
         action = data["query"]
@@ -61,14 +55,25 @@ class Server:
 
     def processQuery_register(self, data):
         username = data["username"]
-        print("User attempting to register with name " + username)
-        if username not in self.activePlayers:
-            self.activePlayers.append(username)
+        if verbose: print("User attempting to register with name " + username)
+        if username not in activePlayers and username not in activePlayers:
+            lobbyPlayers.append(username)
+            print("User Registered: " + username)
+            findMatch()
             return json.dumps({"query": "register", "username": username, "state": "success"})
         else:
             return json.dumps({"query": "register", "username": username, "state": "fail"})
 
         return None
 
-server = Server()
-server.run()
+def main():
+    port = 4321
+    print("Starting server on port {}".format(port))
+
+    factory = protocol.ServerFactory()
+    factory.protocol = Server
+    reactor.listenTCP(port, factory)
+    reactor.run()
+
+if __name__ == '__main__':
+    main()
