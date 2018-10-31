@@ -41,7 +41,7 @@ namespace Gomoku
 			if (Jochen.Tree.Best != null)
 			{
 				FinalBoard = Jochen.Tree.Best.board;
-				Console.WriteLine(FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + "\n");
+				//Console.WriteLine(FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + "\n");
 			}
 			else lost = true;
 			sw.Stop();
@@ -170,7 +170,7 @@ namespace Gomoku
 					val = Tree.Best.Evaluation;
 				}
 
-				Console.Write("Deepness: " + Deepness.ToString());
+				// Console.Write("Deepness: " + Deepness.ToString());
 			}
 
 			public class Root : IComparable<Root>

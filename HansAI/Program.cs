@@ -12,17 +12,18 @@ namespace Gomoku
 			string path = args[0];
 			bool starts = args[1] == "B";
 			int time = int.Parse(args[2]);
+			bool debug = args[3] == "1"; 
 			//string path = Console.ReadLine();
 			//bool starts = Console.ReadLine() == "B";
 
-			Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
+			if(debug) Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
 			Board b = new Board();
 			if (starts)
 			{
 				b.DoMove(new Position(6, 6));
 				File.WriteAllText(path, b.GetMoveString());
-				Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + b.GetMoveString());
+				if (debug) Console.WriteLine("[HansAI]: Starting: TextFileChangedTo " + b.GetMoveString());
 			}
 
 			string lastGame = b.GetMoveString();
@@ -45,7 +46,7 @@ namespace Gomoku
 
 				while(!WriteFile())  Thread.Sleep(10);
 
-				Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
+				if (debug) Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
 			}
 
 			bool CheckFile()
