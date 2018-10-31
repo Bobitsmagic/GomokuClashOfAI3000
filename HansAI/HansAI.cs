@@ -165,6 +165,7 @@ namespace Gomoku
 					if (Tree.moves == null) break;
 					if (Tree.moves.Count <= 1) break;
 				}
+
 				if (Tree.Best != null)
 				{
 					val = Tree.Best.Evaluation;
@@ -201,6 +202,33 @@ namespace Gomoku
 					Winner = board.Winner;
 
 					Evaluation = board.Evaluate();
+
+					if(depth == 0)
+					{
+						List<Board> boards;
+
+						boards = board.GetNearMoves(2);
+
+						boards.Sort();
+						if (Maximize) boards.Reverse();
+
+						moves = new List<Root>(boards.Count);
+
+						for (int i = 0; i < boards.Count; i++)
+						{
+							Root r = new Root(boards[i], depth + 1);
+
+							if (r.Winner != Board.Brick.Empty)
+							{
+								if (r.Winner == board.Turn)
+								{
+									Winner = board.Turn;
+									Best = r;
+									moves = null;
+								}
+							}
+						}
+					}
 				}
 
 				public void FindBest()

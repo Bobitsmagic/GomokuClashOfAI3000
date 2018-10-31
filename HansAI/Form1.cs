@@ -88,7 +88,7 @@ namespace Gomoku
 				b.DoMove(new Position(7, 7));
 				for(int i = 0; i< mc && b.Winner == Board.Brick.Empty; i++)
 				{
-					List<Board> boards = b.GetNearMoves();
+					List<Board> boards = b.GetNearMoves(2);
 
 					count[i]++;
 					vals[i] += boards.Count;
