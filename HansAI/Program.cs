@@ -47,7 +47,7 @@ namespace Gomoku
 				{
 					if (debug) Console.WriteLine("###################Alarm##############");
 
-					List<Board> boards = b.GetNearMoves(2);
+					List<Board> boards = b.GetNearMoves();
 
 					b = boards[0];
 				}
