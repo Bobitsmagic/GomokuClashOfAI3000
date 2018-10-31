@@ -37,6 +37,14 @@ namespace Gomoku
 
 			sw.Start();
 			Jochen.Initialize(board);
+
+			if (Jochen.Tree.Best != null)
+			{
+				FinalBoard = Jochen.Tree.Best.board;
+				//Console.WriteLine(FinalBoard.LastMove.ToString() + " with " + val.ToString("0.000") + "\n");
+			}
+			else lost = true;
+
 			Jochen.Extend(time);
 			if (Jochen.Tree.Best != null)
 			{
@@ -137,11 +145,11 @@ namespace Gomoku
 			public static void Initialize(Board b)
 			{
 				sw = new Stopwatch();
-				sw.Start();
 
 				Deepness = 0;
 
 				ITCount = 1;
+				
 				Tree = new Root(b, 0);
 				//Console.WriteLine("depth 1 in " + sw.ElapsedMilliseconds.ToString("0,000"));
 
@@ -157,6 +165,7 @@ namespace Gomoku
 			public static void Extend(long time)
 			{
 				ITCount = 0;
+				sw.Start();
 				while (sw.ElapsedMilliseconds < time && Tree.Winner == Board.Brick.Empty)
 				{
 					Tree.Visit();
@@ -202,34 +211,6 @@ namespace Gomoku
 					Winner = board.Winner;
 
 					Evaluation = board.Evaluate();
-
-					if(depth == 0)
-					{
-						Console.WriteLine("###################Alarm##############");
-						List<Board> boards;
-
-						boards = board.GetNearMoves(2);
-
-						boards.Sort();
-						if (Maximize) boards.Reverse();
-
-						moves = new List<Root>(boards.Count);
-
-						for (int i = 0; i < boards.Count; i++)
-						{
-							Root r = new Root(boards[i], depth + 1);
-
-							if (r.Winner != Board.Brick.Empty)
-							{
-								if (r.Winner == board.Turn)
-								{
-									Winner = board.Turn;
-									Best = r;
-									moves = null;
-								}
-							}
-						}
-					}
 				}
 
 				public void FindBest()
