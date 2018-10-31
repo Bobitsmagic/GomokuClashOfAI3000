@@ -29,7 +29,7 @@ for game in range(100):
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 10
+    difficulty = 100
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 0"
     process = subprocess.Popen(command, shell = True)
     HansAI = None
@@ -75,6 +75,6 @@ for game in range(100):
     scoreFile = "../score.txt"
     scoreFile = os.path.abspath(scoreFile)
     with open(scoreFile, "a") as fh:
-        print(game)
+        print("Game {} complete".format(game))
         string = "Game {} winner {} {}\n".format(game, winner, winnerCode)
         fh.write(string)
