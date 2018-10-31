@@ -205,6 +205,7 @@ namespace Gomoku
 
 					if(depth == 0)
 					{
+						Console.WriteLine("###################Alarm##############");
 						List<Board> boards;
 
 						boards = board.GetNearMoves(2);
