@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading;
 using System.Windows.Forms;
@@ -9,6 +10,8 @@ namespace Gomoku
 	{
 		private static void Main(string[] args)
 		{
+			Random rnd = new Random();
+
 			string path = args[0];
 			bool starts = args[1] == "B";
 			int time = int.Parse(args[2]);
@@ -34,12 +37,22 @@ namespace Gomoku
 
 				while (CheckFile()) Thread.Sleep(50);
 
+
 				b = new Board(path);
+				if (debug) Console.WriteLine("[HansAI]: Reading " + lastGame);
+
 				//b.WriteData();
 
 				HansAI bob = new HansAI(b, time);
-				if (bob.FinalBoard == null) break;
-				b = bob.FinalBoard;
+				if (bob.FinalBoard == null)
+				{
+					if (debug) Console.WriteLine("###################Alarm##############");
+
+					List<Board> boards = b.GetNearMoves(2);
+
+					b = boards[rnd.Next(boards.Count)];
+				}
+				else b = bob.FinalBoard;
 
 				//b.WriteData();
 				lastGame = b.GetMoveString();
@@ -48,6 +61,7 @@ namespace Gomoku
 
 				if (debug) Console.WriteLine("[HansAI]: TextFileChangedTo " + lastGame);
 			}
+
 
 			bool CheckFile()
 			{
