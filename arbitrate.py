@@ -7,8 +7,7 @@ import subprocess
 from Gogogo.Board import Board
 from Gogogo.AI import AI
 
-gameCount = 10
-for game in range(gameCount):
+for game in range(100):
     saveFile = "../game.gom"
     saveFile = os.path.abspath(saveFile)
 
@@ -21,7 +20,7 @@ for game in range(gameCount):
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 10
+    difficulty = 1000
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty)
     process = subprocess.Popen(command, shell = True)
     HansAI = None
@@ -69,9 +68,7 @@ for game in range(gameCount):
     with open(scoreFile, "a") as fh:
         if winner == b:
             print("Black is the victor!")
-            fh.write("Winner B\n")
-            fh.write(winnerCode + "\n")
+            fh.write("Winner B {}\n".format(winnerCode))
         else:
             print("White is the victor!")
-            fh.write("Winner W\n")
-            fh.write(winnerCode + "\n")
+            fh.write("Winner W {}\n".format(winnerCode))
