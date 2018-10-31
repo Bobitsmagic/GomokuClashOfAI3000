@@ -1,6 +1,11 @@
-from __future__ import print_function
+#!/usr/bin/env python3
+
+#from __future__ import print_function
 from twisted.internet import reactor, protocol
 import json, time, random
+
+from Board import Board
+from AI import AI
 
 port = 4321
 verbose = 1

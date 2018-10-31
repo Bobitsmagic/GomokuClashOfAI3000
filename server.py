@@ -6,7 +6,6 @@ verbose = 1
 activePlayers = []
 lobbyPlayers = []
 activeMatches = []
-
 sockets = {}
 
 class Match(object):

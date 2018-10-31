@@ -4,8 +4,8 @@ import random
 from datetime import datetime
 random.seed(datetime.now())
 
-from .Board import Board
-from .Tactic import Tactic
+from Board import Board
+from Tactic import Tactic
 
 E = "E"
 B = "B"
