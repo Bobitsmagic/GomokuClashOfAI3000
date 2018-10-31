@@ -10,15 +10,15 @@ namespace Gomoku
 	{
 		private static void Main(string[] args)
 		{
-			Random rnd = new Random();
-
 			string path = args[0];
 			bool starts = args[1] == "B";
 			int time = int.Parse(args[2]);
 			bool debug = args[3] == "1";
+
 			//string path = Console.ReadLine();
 			//bool starts = Console.ReadLine() == "B";
 
+			Random rnd = new Random();
 			if (debug) Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
 			Board b = new Board();
