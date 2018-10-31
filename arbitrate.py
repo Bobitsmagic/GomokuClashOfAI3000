@@ -48,6 +48,7 @@ for game in range(100):
 
         b.move()
         with open(saveFile, "r") as fh: gameState = fh.read()
+        b.board.render()
 
         start = os.stat(saveFile).st_mtime
         playerMoved = False
@@ -62,7 +63,6 @@ for game in range(100):
         board = Board()
         board.processCode(gameState)
         b.board = board
-
         board.render()
 
         if board.winner != None:
