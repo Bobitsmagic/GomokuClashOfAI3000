@@ -43,7 +43,10 @@ namespace Gomoku
 				//b.WriteData();
 
 				HansAI bob = new HansAI(b, time);
-				if (bob.FinalBoard == null) break;
+				if (bob.FinalBoard == null)
+				{
+					bob.FinalBoard = b.GetAllMoves()[0];
+				}
 				
 				b = bob.FinalBoard;
 
