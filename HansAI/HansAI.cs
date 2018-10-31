@@ -247,8 +247,7 @@ namespace Gomoku
 						}
 
 
-					}
-						
+					}					
 				}
 
 				public void FindBest()

@@ -259,10 +259,10 @@ namespace Gomoku
 					{
 						list.Add(new Board(this, new Position(x, y)));
 
-						if (list.Last().Winner != Brick.Empty)
-						{
-							return new List<Board>(1) { list.Last() };
-						}
+						//if (list.Last().Winner != Brick.Empty)
+						//{
+						//	return new List<Board>(1) { list.Last() };
+						//}
 					}
 				}
 			}
