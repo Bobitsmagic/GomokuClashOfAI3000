@@ -43,26 +43,9 @@ namespace Gomoku
 				//b.WriteData();
 
 				HansAI bob = new HansAI(b, time);
-				if (bob.FinalBoard == null)
-				{
-
-					List<Board> boards = b.GetNearMoves();
-
-					if (debug)
-					{
-						if(boards.Count == 0)
-						{
-							Console.WriteLine("###################Alarm##############");
-
-						}
-						else
-						{
-							b = boards[0];
-
-						}
-					}
-				}
-				else b = bob.FinalBoard;
+				if (bob.FinalBoard == null) break;
+				
+				b = bob.FinalBoard;
 
 				//b.WriteData();
 				lastGame = b.GetMoveString();
