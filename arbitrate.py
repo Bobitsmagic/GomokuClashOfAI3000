@@ -20,7 +20,7 @@ for game in range(100):
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 1000
+    difficulty = 100
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 0"
     process = subprocess.Popen(command, shell = True)
     HansAI = None
@@ -67,6 +67,7 @@ for game in range(100):
     scoreFile = os.path.abspath(scoreFile)
     with open(scoreFile, "a") as fh:
         if winner == b:
+            #print("Game {} winner: {}")
             print("Black is the victor!")
             fh.write("Winner B {}\n".format(winnerCode))
         else:
