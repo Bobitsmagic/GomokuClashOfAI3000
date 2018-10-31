@@ -18,7 +18,6 @@ namespace Gomoku
 			//string path = Console.ReadLine();
 			//bool starts = Console.ReadLine() == "B";
 
-			Random rnd = new Random();
 			if (debug) Console.WriteLine("[HansAI]: Color: " + (starts ? "Black" : "White") + ", TextPath: " + path);
 
 			Board b = new Board();
@@ -50,7 +49,7 @@ namespace Gomoku
 
 					List<Board> boards = b.GetNearMoves(2);
 
-					b = boards[rnd.Next(boards.Count)];
+					b = boards[0];
 				}
 				else b = bob.FinalBoard;
 
