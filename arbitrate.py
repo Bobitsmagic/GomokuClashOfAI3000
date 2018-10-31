@@ -31,7 +31,7 @@ for game in range(100):
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
     difficulty = 10
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 1"
-    process = subprocess.Popen(command, shell = True)
+    process = subprocess.Popen(command, stdout = subprocess.PIPE, shell = True)
     HansAI = None
 
     b = gogogo
@@ -71,7 +71,9 @@ for game in range(100):
             break
 
         turn += 1
-    
+
+    process.kill()
+
     scoreFile = "../score.txt"
     scoreFile = os.path.abspath(scoreFile)
     with open(scoreFile, "a") as fh:
