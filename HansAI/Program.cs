@@ -10,6 +10,7 @@ namespace Gomoku
 	{
 		private static void Main(string[] args)
 		{
+			Console.WriteLine("Hello World");
 			string path = args[0];
 			bool starts = args[1] == "B";
 			int time = int.Parse(args[2]);
@@ -45,6 +46,11 @@ namespace Gomoku
 				HansAI bob = new HansAI(b, time);
 				if (bob.FinalBoard == null)
 				{
+					if(b.GetAllMoves().Count == 0)
+					{
+						break;
+					}
+						
 					bob.FinalBoard = b.GetAllMoves()[0];
 				}
 				
