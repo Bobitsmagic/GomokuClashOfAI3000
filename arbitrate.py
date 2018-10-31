@@ -17,6 +17,8 @@ def savestate(filename, state):
 
     return savestate(filename, state)
 
+HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
+
 for game in range(100):
     saveFile = "../game.gom"
     saveFile = os.path.abspath(saveFile)
@@ -28,9 +30,9 @@ for game in range(100):
     gogogo = AI(gogogo_board, "B", saveFile = saveFile, verbose = True)
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
-    HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 10
+    difficulty = 100
     command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 1"
+    print("Executing cmd: " + command)
     process = subprocess.Popen(command, stdout = subprocess.PIPE, shell = True)
     HansAI = None
 
