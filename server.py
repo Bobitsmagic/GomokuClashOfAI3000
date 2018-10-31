@@ -11,22 +11,43 @@ sockets = {}
 
 class Match(object):
     def __init__(self, playerA, playerAStone, playerB, playerBStone):
-        sockets[playerA].createMatch(playerA, playerAStone, playerB, playerBStone, playerB)
-        sockets[playerB].createMatch(playerA, playerAStone, playerB, playerBStone, playerA)
-
         self.playerA = playerA
-        self.playerAStone = playerAStone
         self.playerB = playerB
-        self.playerBStone = playerBStone
-        if self.playerAStone == "B": self.currentPlayer = self.playerA
-        if self.playerBStone == "B": self.currentPlayer = self.playerB
+        self.stones = {}
+        self.stones[self.playerA] = playerAStone
+        self.stones[self.playerB] = playerBStone
+        if self.stones[self.playerA] == "B": self.currentPlayer = self.playerA
+        if self.stones[self.playerB] == "B": self.currentPlayer = self.playerB
+
+        self.history = ""
 
         thread = threading.Thread(target = self.run, args = ())
         thread.daemon = True
         thread.start()
 
     def run(self):
-        print("Match started!!!")
+        time.sleep(1)   # [TODO] This is a bad hack to sync client response, do it correctly instead
+        self.requestMove()
+
+    def requestMove(self):
+        sockets[self.currentPlayer].move(self)
+
+    def processMove(self, data):
+        player = data["username"]
+        move = data["move"]
+
+        if player == self.currentPlayer:
+            # [TODO] Have board check if it's a valid move
+            self.history = self.history + move
+            print("Game history is now " + self.history)
+            if False: pass
+            elif self.currentPlayer == self.playerA: self.currentPlayer = self.playerB
+            elif self.currentPlayer == self.playerB: self.currentPlayer = self.playerA
+            self.requestMove()
+        else:
+            print("Incorrect move response of\n\t" + str(data))
+
+        #print("match got " + str(data))
 
 class MatchmakingSystem(object):
     def __init__(self, interval = 0.5):
@@ -55,27 +76,26 @@ class MatchmakingSystem(object):
             # [TODO] Make this randomized
             playerAStone = "B"
             playerBStone = "W"
+
             match = Match(playerA, playerAStone, playerB, playerBStone)
+            sockets[playerA].joinMatch(match)
+            sockets[playerB].joinMatch(match)
+            activeMatches.append(match)
 
 class Server(protocol.Protocol):
-    def dataReceived(self, data):
-        reply = None
+    def __init__(self):
+        self.match = None
 
+    def dataReceived(self, data):
         try:
             data = data.decode()
             data = json.loads(data)
             if verbose > 1: print("Received\n\t" + str(data))
 
             if "query" in data:
-                if data["query"] == "register":
-                    reply = self.processQuery(data)
+                self.processQuery(data)
         except:
-            print("Recieved incorrect JSON\n\t" + str(data))
-        finally:
-            if reply == None:
-                reply = {"response": "bad"}
-
-            self.sendData(reply)
+            print("Recieved incorrect JSON, or could not process it\n\t" + str(data))
 
     def sendData(self, data):
         if verbose > 1: print("Sending\n\t" + str(data))
@@ -87,9 +107,9 @@ class Server(protocol.Protocol):
         query = data["query"]
 
         if query == "register":
-            return self.processQuery_register(data)
-
-        return None
+            self.processQuery_register(data)
+        if query == "move":
+            self.processQuery_move(data)
 
     def processQuery_register(self, data):
         username = data["username"]
@@ -104,8 +124,15 @@ class Server(protocol.Protocol):
 
         return None
 
-    def createMatch(self, playerA, playerAStone, playerB, playerBStone, opponent):
-        self.sendData({"query" : "match", playerA : playerAStone, playerB : playerBStone, "opponent" : opponent})
+    def processQuery_move(self, data):
+        self.match.processMove(data)
+
+    def joinMatch(self, match):
+        self.match = match
+        self.sendData({"query" : "match", "players" : [match.playerA, match.playerB], match.playerA : match.stones[match.playerA], match.playerB : match.stones[match.playerB]})
+
+    def move(self, match):
+        self.sendData({"query" : "move", "stone" : match.stones[match.currentPlayer]})
 
 def main():
     port = 4321

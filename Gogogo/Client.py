@@ -12,8 +12,7 @@ class Client(protocol.Protocol):
         self.register()
 
         self.inMatch = False
-        self.myStone = None
-        self.opponentStone = None
+        self.matchStones = {}
 
     def dataReceived(self, data):
         # [TODO] Find a proper place to close this out
@@ -25,9 +24,9 @@ class Client(protocol.Protocol):
             if verbose > 1: print("Received\n\t" + str(data))
 
             if "query" in data:
-                self.processQuery(data)
+                return self.processQuery(data)
         except:
-            print("Recieved incorrect JSON\n\t" + str(data))
+            print("Recieved incorrect JSON, or could not process it\n\t" + str(data))
         finally:
             pass
 
@@ -44,6 +43,8 @@ class Client(protocol.Protocol):
             self.processQuery_register(data)
         if query == "match":
             self.processQuery_match(data)
+        if query == "move":
+            self.processQuery_move(data)
 
     def connectionLost(self, reason):
         print("Connection lost")
@@ -66,10 +67,20 @@ class Client(protocol.Protocol):
 
     def processQuery_match(self, data):
         self.inMatch = True
-        self.opponent = data["opponent"]
-        self.myStone = data[self.username]
-        self.opponentStone = data[self.opponent]
-        print("Entered match ({}) against player {} ({})".format(self.myStone, self.opponent, self.opponentStone))
+
+        players = data["players"]
+        for player in players:
+            stone = data[player]
+            self.matchStones[player] = stone
+
+        # [TODO] Get this to render all information of the match
+        print("Entered match ({})".format(self.matchStones[self.username]))
+
+    def processQuery_move(self, data):
+        # [TODO] Here is where we interface with the A.I.
+        move = "GG"
+        print("Making move " + move)
+        self.sendData({"query" : "move", "username" : self.username, "stone" : self.matchStones[self.username], "move" : move})
 
 class Factory(protocol.ClientFactory):
     protocol = Client
