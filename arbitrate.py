@@ -29,8 +29,8 @@ for game in range(100):
     #HansAI = AI(gogogo_board, "W", saveFile = saveFile)
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
-    difficulty = 100
-    command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 0"
+    difficulty = 10
+    command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 1"
     process = subprocess.Popen(command, shell = True)
     HansAI = None
 
