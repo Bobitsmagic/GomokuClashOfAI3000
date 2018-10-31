@@ -241,7 +241,7 @@ namespace Gomoku
 							else moves.Add(r);
 						}
 
-						if (moves.Count == 0)
+						if (moves?.Count == 0)
 						{
 							Winner = board.Turn == Board.Brick.White ? Board.Brick.Black : Board.Brick.White;
 						}
