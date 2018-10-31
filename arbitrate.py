@@ -21,7 +21,7 @@ for game in range(100):
 
     HansAI_loc = os.path.abspath("./HansAI/bin/Release/Gomoku.exe")
     difficulty = 1000
-    command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty)
+    command = HansAI_loc + " " + saveFile + " " + "W" + " " + str(difficulty) + " 0"
     process = subprocess.Popen(command, shell = True)
     HansAI = None
 
