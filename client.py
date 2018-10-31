@@ -25,19 +25,29 @@ class Client:
 
         # [TODO] Add error checking here for if not connected
 
+    def getData(self):
+        # [TODO] Determine if 1024 is not long enough for long games
+        data = self.sock.recv(1024).decode()
+        try:
+            data = json.loads(data)
+            return data
+        except:
+            print("Server did not send proper JSON")
+            return None
+
     def register(self):
         self.registered = False
         try:
             message = json.dumps({"query": "register", "username": self.username})
             self.sock.sendall(message.encode())
 
-            # [TODO] Determine if 1024 is not long enough for long games
-            data = self.sock.recv(1024).decode()
-            data = json.loads(data)
+            data = self.getData()
+            if data == None:
+                return False
 
             if "query" not in data:
                 if self.verbose:
-                    print("Failed to receive proper reply from server")
+                    print("Failed to receive proper reply from server:\n\t" + str(data))
                 return False
 
             if data["query"] == "register" and data["state"] == "success":
