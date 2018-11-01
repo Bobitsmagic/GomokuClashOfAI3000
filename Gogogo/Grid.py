@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import random
+
 ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 standardAllowedItems = ["."]
 
@@ -128,6 +130,7 @@ class Move:
             if item in ["s", "S"]:
                 self.available.append(available)
 
+    # [TODO] Determine if score() should prune things, or if it should be done instead with a sync() function
     def score(self, grid, target):
         retVal = 1          # Default score indicating you can place here at the very least
 
@@ -162,7 +165,7 @@ class Move:
         return retVal
 
 board = Grid(15, 15)
-target = "B"
+target = "W"
 tactics = []
 tactics.append(Tactic("AASBAsCAsDAsEAs", board, target))    # L -> R
 tactics.append(Tactic("AAsBAsCAsDAsEAS", board, target))    # L <- R
@@ -186,9 +189,30 @@ for y in range(board.h):
             move.addTactic(tactic)
         moves.append(move)
 
-for y in range(board.h):
-    for x in range(board.w):
-        move = moves[y * board.w + x]
+while True:
+    data = input("Move? ")
+    data = data.upper()
+    board.place(data)
+
+    """
+    for y in range(board.h):
+        for x in range(board.w):
+            move = moves[y * board.w + x]
+            score = move.score(board, target)
+            print("{}\t".format(score), end = "")
+        print()
+    """
+
+    highscore = 0
+    goodMoves = []
+    for move in moves:
         score = move.score(board, target)
-        print("{}\t".format(score), end = "")
-    print()
+        if score > highscore:
+            highscore = score
+            goodMoves = []
+        if score == highscore:
+            goodMoves.append(move)
+
+    selection = random.SystemRandom().choice(goodMoves)
+    loc = ALPHABET[selection.x] + ALPHABET[selection.y]
+    print("{}\t{}, {}\t{}".format(score, selection.x, selection.y, loc))
